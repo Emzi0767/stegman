@@ -92,6 +92,15 @@ under other POSIX-compatible systems, provided appropriate prerequisites are
 installed, however that is not guaranteed. Furthermore the program was not 
 tested under Windows at all.
 
+Under Debian 10 (Buster) all requirements can be installed by doing:
+
+```bash
+$ sudo apt-get install clang-6.0 lld-6.0 llvm-6.0 libssl-dev zlib1g-dev libpng-dev make build-essential git
+```
+
+Then you can simply clone this repository, and in its root directory, run 
+`make CC=clang-6.0 LD=lld`
+
 ## Libraries
 * OpenSSL
 * ZLib
