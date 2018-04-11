@@ -40,7 +40,7 @@ images, the final (compressed + encrypted) message can be
   whether any data is present at all.
 * The flags are encoded as a 32-bit integer (4 bytes). The documentation for 
   them is available below.
-* 
+* Hash cycle count is a 16-bit unsigned integer (2 bytes).
 * IV is 16 bytes.
 * Salt is 16 bytes.
 * Length is encoded as a 64-bit integer (8 bytes), it does not include padding.
