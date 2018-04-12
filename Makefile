@@ -8,8 +8,8 @@ ONAME=stegman
 OBJ=obj/
 
 LIBS=-lm -lssl -lpng -lz
-DEPS = sha256.h aes.h zlib.h steg.h defs.h
-OBJS = $(OBJ)sha256.o $(OBJ)aes.o $(OBJ)zlib.o $(OBJ)steg.o $(OBJ)program.o
+DEPS = sha256.h aes.h zlib.h steg.h png.h defs.h
+OBJS = $(OBJ)sha256.o $(OBJ)aes.o $(OBJ)zlib.o $(OBJ)steg.o $(OBJ)png.o $(OBJ)program.o
 
 $(OBJ)%.o: %.c $(DEPS)
 	@[ -d $(OBJ) ] || mkdir -p $(OBJ)
