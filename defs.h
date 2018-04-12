@@ -34,6 +34,9 @@ extern "C"
 {
 #endif
 
+// Standard types
+#include <stddef.h>
+
 // Integer types
 #include <stdint.h>
 

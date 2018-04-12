@@ -34,7 +34,51 @@ extern "C"
 {
 #endif
 
+// The size of the AES-256 key
+const int32_t KEY_SIZE = 32;
 
+// The size of the AES-256 initialization vector
+const int32_t IV_SIZE = 16;
+
+/*
+ * Generates an AES-256 Initialization Vector using a Cryptographically-Secure
+ * Pseudorandom Number Generator.
+ *
+ * iv: Array to fill with IV bytes.
+ *
+ * returns: Whether the operation succeeded.
+ */
+int32_t aes_gen_iv(uint8_t iv[IV_SIZE]);
+
+/*
+ * Encrypts a specified message, using specified key and initialization vector.
+ *
+ * msg: Pointer to byte array, containing data to encrypt.
+ * len: Length of the data to encrypt.
+ * key: Key to use when encrypting.
+ * iv: Initialization vector to use when encrypting.
+ * result: Pointer to a pointer to byte array where encrypted data will be
+ *         placed. The pointer to bytes will be initialized.
+ * reslen: Pointer to integer, which will be set to resulting data length.
+ *
+ * returns: Whether the operation succeeded.
+ */
+int32_t aes_encrypt(const uint8_t *msg, uint64_t len, const uint8_t key[KEY_SIZE], const uint8_t iv[IV_SIZE], uint8_t **result, uint64_t *reslen);
+
+/*
+ * Decrypts a specified message, using specified key and initialization vector.
+ *
+ * msg: Pointer to byte array containing data to decrypt.
+ * len: Length of the data to decrypt.
+ * key: Key to use when decrypting.
+ * iv: Initialization vector to use when decrypting.
+ * result: Pointer to a pointer to byte array where decrypted data will be
+ *         placed.
+ * reslen: Pointer to integer, which will be set to resulting data length.
+ *
+ * returns: Whether the operation succeeded.
+ */
+int32_t aes_decrypt(const uint8_t *msg, uint64_t len, const uint8_t key[KEY_SIZE], const uint8_t iv[IV_SIZE], uint8_t **result, uint64_t *reslen);
 
 // Define C extern for C++
 #ifdef __cplusplus

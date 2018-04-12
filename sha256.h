@@ -34,7 +34,35 @@ extern "C"
 {
 #endif
 
+// The size of the SHA-256 salt
+const int32_t SALT_SIZE = 16;
 
+// The size of the SHA-256 digest
+const int32_t DIGEST_SIZE = 32;
+
+/*
+ * Generates an SHA-256 Salt using a Cryptographically-Secure Pseudorandom
+ * Number Generator.
+ *
+ * salt: Array to fill with salt bytes.
+ *
+ * returns: Whether the operation succeded.
+ */
+int32_t sha_gen_salt(uint8_t salt[SALT_SIZE]);
+
+/*
+ * Hashes the supplied message using SHA-256 algorithm, using specified salt,
+ * and cycle count.
+ *
+ * msg: Message to create a digest of.
+ * len: Length of the message.
+ * salt: Salt to use when hashing.
+ * cycles: Hashing cycle count.
+ * result: The hashed message.
+ *
+ * returns: Whether the operation succeeded.
+ */
+int32_t sha_hash(const uint8_t *msg, size_t len, uint8_t salt[SALT_SIZE], uint16_t cycles, uint8_t result[DIGEST_SIZE]);
 
 // Define C extern for C++
 #ifdef __cplusplus

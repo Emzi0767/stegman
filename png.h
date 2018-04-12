@@ -20,6 +20,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+// Only include once
+#pragma once
+
 // Check if we're using a C99-capable compiler
 #if __STDC_VERSION__ < 199901L
 #error "You need to use a C99-capable compiler to build this program!"
@@ -31,9 +34,7 @@ extern "C"
 {
 #endif
 
-// Appropriate headers
-#include "defs.h"
-#include "steg.h"
+
 
 // Define C extern for C++
 #ifdef __cplusplus

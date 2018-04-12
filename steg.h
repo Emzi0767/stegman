@@ -34,7 +34,44 @@ extern "C"
 {
 #endif
 
+// Message setting flags
+typedef enum StegMessageFlags
+{
+	// The source message was a file
+	MSG_FILE = 1
+} StegMessageFlags;
 
+// Structure holding the message
+typedef struct StegMessage
+{
+	// 0x0BADFACE
+	const int32_t magic;
+
+	// Setting flags of the message
+	StegMessageFlags flags;
+
+	// Number of cycles to hash the password
+	uint16_t cycles;
+
+	// Initialization vector for AES
+	uint8_t iv[16];
+
+	// Salt to use for password
+	uint8_t salt[16];
+
+	// Length of the encoded data
+	uint64_t length;
+
+	// Pointer to data
+	uint8_t *contents;
+} StegMessage;
+
+/*
+ * Initializes given StegMessage with proper constants.
+ *
+ * msg: Pointer to the message to initialize.
+ */
+void steg_init_msg(StegMessage *msg);
 
 // Define C extern for C++
 #ifdef __cplusplus

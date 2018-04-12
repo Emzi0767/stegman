@@ -31,9 +31,9 @@ extern "C"
 {
 #endif
 
-// Appropriate headers
+// Appropriate header
 #include "defs.h"
-#include "steg.h"
+#include "png.h"
 
 // Define C extern for C++
 #ifdef __cplusplus
