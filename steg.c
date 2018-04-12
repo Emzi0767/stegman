@@ -35,6 +35,16 @@ extern "C"
 #include "defs.h"
 #include "steg.h"
 
+// Standard library
+#include <string.h>
+
+// Function definitions
+void steg_init_msg(StegMessage *msg)
+{
+	int32_t magic = STEG_MAGIC;
+	memcpy(msg, &magic, sizeof(magic));
+}
+
 // Define C extern for C++
 #ifdef __cplusplus
 }
