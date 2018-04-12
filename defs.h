@@ -34,11 +34,24 @@ extern "C"
 {
 #endif
 
+// Enable unicode
+#define _UNICODE
+#define UNICODE
+
 // Standard types
 #include <stddef.h>
 
 // Integer types
 #include <stdint.h>
+
+// Wide char types
+#include <wchar.h>
+
+// Program metadata
+extern const wchar_t* const PROGRAM_NAME;
+extern const wchar_t* const PROGRAM_VERSION;
+extern const wchar_t* const PROGRAM_AUTHOR;
+extern const wchar_t* const PROGRAM_DESCRIPTION;
 
 // Define C extern for C++
 #ifdef __cplusplus

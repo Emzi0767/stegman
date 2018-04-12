@@ -14,7 +14,7 @@ OBJS = $(OBJ)sha256.o $(OBJ)aes.o $(OBJ)zlib.o $(OBJ)steg.o $(OBJ)png.o $(OBJ)pr
 $(OBJ)%.o: %.c $(DEPS)
 	@[ -d $(OBJ) ] || mkdir -p $(OBJ)
 	@echo " [ CC ] " $@
-	@$(CC) -c -o $@ $< $(CFLAGS)
+	@$(CC) -c -o $@ $< $(CFLAGS) -finput-charset=UTF-8
 
 $(ODIR)/$(ONAME): $(OBJS)
 	@[ -d $(ODIR) ] || mkdir -p $(ODIR)
