@@ -76,6 +76,28 @@ typedef struct StegMessage
  */
 void steg_init_msg(StegMessage *msg);
 
+/*
+ * Encodes supplied data in the supplied pixel array.
+ *
+ * data: Data to encode in the pixels.
+ * pixels: Pixels to encode the data in.
+ * pixellen: Length of the encoding pixel array.
+ *
+ * returns: Whether the operation succeded.
+ */
+bool steg_encode(const StegMessage *data, uint8_t *pixels, size_t pixellen);
+
+/*
+ * Decodes supplied data from the supplied pixel array.
+ *
+ * pixels: Pixels to decode the data from.
+ * pixellen: Length of the decoded pixel array.
+ * data: Pointer to the structure with decoded data.
+ *
+ * returns: Whether the operation succeeded.
+ */
+bool steg_decode(const uint8_t *pixels, size_t pixellen, StegMessage *data);
+
 // Define C extern for C++
 #ifdef __cplusplus
 }

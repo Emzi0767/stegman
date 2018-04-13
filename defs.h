@@ -44,6 +44,9 @@ extern "C"
 // Integer types
 #include <stdint.h>
 
+// Boolean type
+#include <stdbool.h>
+
 // Wide char types
 #include <wchar.h>
 
