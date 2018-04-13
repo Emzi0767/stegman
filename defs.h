@@ -47,8 +47,12 @@ extern "C"
 // Boolean type
 #include <stdbool.h>
 
+// Char types
+#include <ctype.h>
+
 // Wide char types
 #include <wchar.h>
+#include <wctype.h>
 
 // Program metadata
 extern const wchar_t* const PROGRAM_NAME;

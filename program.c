@@ -65,6 +65,36 @@ int32_t werrorf(const wchar_t* format, ...);
  */
 void print_usage(char* progname);
 
+/*
+ * Encodes data.
+ *
+ * password: Password to encrypt the data with.
+ * passlen: Length of the password.
+ * file: Data of the file to encode the data into.
+ * filelen: Length of the file data to encode into.
+ * message: Message data to encode.
+ * msglen: Length of the message to encode.
+ * isfile: Whether the message was a file.
+ *
+ * returns: Whether the operation was successful.
+ */
+bool encode(const wchar_t *password, size_t passlen, uint8_t *file, size_t filelen, const uint8_t *message, size_t msglen, bool isfile);
+
+/*
+ * Decodes data.
+ *
+ * password: Password to decrypt the data with.
+ * passlen: Length of the password.
+ * file: Data of the file to decode the data from.
+ * filelen: Length of the file to decode data from.
+ * message: Pointer to message bytes. Underlying pointer will be initialized.
+ * msglen: Length of the resulting message.
+ * isfile: Whether the message is a file.
+ *
+ * returns: Whether the operation was successful.
+ */
+bool decode(const wchar_t *password, size_t passlen, const uint8_t *file, size_t filelen, uint8_t **message, size_t *msglen, bool *isfile);
+
 // Entry point
 int32_t main(int argc, char** argv)
 {
@@ -73,6 +103,116 @@ int32_t main(int argc, char** argv)
 
 	// Check if there's enough arguments supplied
 	if (argc < 3 || argc > 5)
+	{
+		print_usage(argv[0]);
+		return 1;
+	}
+
+	// Check if the first argument is encode or decode
+	size_t oplen = strlen(argv[1]);
+	for (int i = 0; i < oplen; i++)
+		argv[1][i] = tolower(argv[1][i]);
+
+	if (strcmp(argv[1], "encode"))
+	{
+		// Encode the data
+		// TODO: free things on failure
+		// TODO: introduce failure helper
+
+		// Attempt to load the PNG file
+		FILE* fpng = fopen(argv[3], "rb");
+		if (!fpng)
+		{
+			werrorf(L"There was an error opening '%s'\n", argv[3]);
+			return 2;
+		}
+
+		// Get its size
+		if (!fseek(fpng, 0L, SEEK_END))
+		{
+			werrorf(L"There was an error measuring the file size (E_ERR_SEEK_END)\n");
+			return 4;
+		}
+		int64_t fsize = ftell(fpng);
+		if (fsize == -1L)
+		{
+			werrorf(L"There was an error measuring the file size (E_ERR_GET_POS)\n");
+			return 8;
+		}
+		if (!fseek(fpng, 0L, SEEK_SET))
+		{
+			werrorf(L"There was an error measuring the file size (E_ERR_SEEK_BEGIN)\n");
+			return 16;
+		}
+
+		// Allocate the PNG buffer
+		uint8_t *fdata = (uint8_t*)calloc(fsize, sizeof(uint8_t));
+		if (!fdata)
+		{
+			werrorf(L"Could not allocate memory (E_PNG_ALLOC)\n");
+			return 32;
+		}
+
+		// Read the data into the PNG buffer
+		if (fread(fdata, sizeof(uint8_t), (size_t)fsize, fpng) != (size_t)fsize)
+		{
+			werrorf(L"Could not read PNG data (E_BUFFER_UNDERRUN)\n");
+			return 64;
+		}
+
+		// Close the PNG file, we don't need it anymore
+		fclose(fpng);
+
+		// Convert the password to a proper-type string
+		size_t pwlen = mblen(argv[2], MB_CUR_MAX);
+		wchar_t *pw = (wchar_t*)calloc(pwlen, sizeof(wchar_t));
+		if (!pw)
+		{
+			werrorf(L"Could not allocate memory (E_PWD_ALLOC)\n");
+			return 128;
+		}
+		if (!mbstowcs(pw, argv[2], pwlen))
+		{
+			werrorf(L"Could not convert password (E_PWD_MBCSTOWCS)");
+			return 256;
+		}
+
+		// Check if the input message is a file
+		bool isfile = argv[4][0] == '@';
+		uint8_t *msg;
+		size_t msglen;
+		if (isfile)
+		{
+			// Handle as file
+		}
+		else
+		{
+			// Handle as unicode string
+			size_t mlen = mblen(argv[4], MB_CUR_MAX);
+			msg = (uint8_t*)calloc(mlen, sizeof(wchar_t));
+			msglen = mlen * sizeof(wchar_t);
+			if (!msg)
+			{
+				werrorf(L"Could not allocate memory (E_MSG_ALLOC)\n");
+				return 512;
+			}
+			if (!mbstowcs((wchar_t*)msg, argv[4], mlen))
+			{
+				werrorf(L"Could not convert message (E_MSG_MBCSTOWCS)\n");
+				return 1024;
+			}
+		}
+
+		// Free the file data
+		free(msg);
+		free(pw);
+		free(fdata);
+	}
+	else if (strcmp(argv[1], "decode"))
+	{
+		// Decode the data
+	}
+	else
 	{
 		print_usage(argv[0]);
 		return 1;
