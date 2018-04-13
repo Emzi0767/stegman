@@ -34,7 +34,39 @@ extern "C"
 {
 #endif
 
+// Metadata about the loaded image.
+typedef struct PngImageInfo
+{
+	int32_t width;
+	int32_t height;
+	uint8_t bit_depth;
+} PngImageInfo;
 
+/*
+ * Loads pixels from a supplied PNG image.
+ *
+ * src: Bytes of the image file.
+ * srclen: Length of the source file.
+ * tgt: Pointer to target bytes. This pointer will be initialized.
+ * tgtlen: Pointer to length of resulting data.
+ * imginfo: Information about the image.
+ *
+ * returns: Whether the operation succeded.
+ */
+int32_t png_load_pixels(const uint8_t *src, size_t srclen, uint8_t **tgt, size_t *tgtlen, PngImageInfo *imginfo);
+
+/*
+ * Writes supplied pixels to a PNG file.
+ *
+ * src: Pixels to write.
+ * srclen: Length of the pixel array.
+ * imginfo: Information about the pixels.
+ * tgt: Pointer to target PNG bytes. This pointer will be initialized.
+ * tgtlen: Pointer to length of resulting data.
+ *
+ * returns: Whether the operation succeeded.
+ */
+int32_t png_save_pixels(const uint8_t *src, size_t srclen, const PngImageInfo imginfo, uint8_t **tgt, size_t *tgtlen);
 
 // Define C extern for C++
 #ifdef __cplusplus
