@@ -58,7 +58,7 @@ int32_t zlib_compress(const uint8_t *data, uint64_t length, uint8_t **result, ui
 	}
 
 	int32_t res = compress2(*result, &buflen, data, length, Z_BEST_COMPRESSION);
-	if (!res)
+	if (res != Z_OK)
 	{
 		free(*result);
 		return res;

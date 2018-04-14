@@ -47,9 +47,6 @@ extern "C"
 #include <locale.h>
 #include <time.h>
 
-// OpenSSL
-#include <openssl/err.h>
-
 // Constant definitions
 const wchar_t *const PROGRAM_NAME        = L"Stegman";
 const wchar_t *const PROGRAM_VERSION     = L"1.0.0";
@@ -346,17 +343,17 @@ bool encode(const wchar_t *password, size_t passlen, uint8_t *file, size_t filel
 
 	// Generate salt
 	int32_t res = sha_gen_salt(salt);
-	if (!res)
+	if (res)
 	{
-		werrorf(L"Error generating salt (%lu). Refer to OpenSSL docs for RAND_bytes for more details.\n", ERR_get_error());
+		werrorf(L"Error generating salt (%lu). Refer to OpenSSL docs for RAND_bytes for more details.\n", res);
 		return false;
 	}
 
 	// Generate IV
 	res = aes_gen_iv(iv);
-	if (!res)
+	if (res)
 	{
-		werrorf(L"Error generating IV (%lu). Refer to OpenSSL docs for RAND_bytes for more details.\n", ERR_get_error());
+		werrorf(L"Error generating IV (%lu). Refer to OpenSSL docs for RAND_bytes for more details.\n", res);
 		return false;
 	}
 
@@ -366,9 +363,9 @@ bool encode(const wchar_t *password, size_t passlen, uint8_t *file, size_t filel
 
 	// Create the AES key by hashing the password using SHA-256
 	res = sha_hash((uint8_t*)password, passlen * sizeof(wchar_t), salt, hc, key);
-	if (!res)
+	if (res)
 	{
-		werrorf(L"Error generating AES key (%lu). Refer to OpenSSL docs for SHA256 for more details.\n", ERR_get_error());
+		werrorf(L"Error generating AES key (%lu). Refer to OpenSSL docs for SHA256 for more details.\n", res);
 		return false;
 	}
 

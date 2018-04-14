@@ -49,7 +49,11 @@ const int32_t DIGEST_SIZE = 32;
 // Function definitions
 int32_t sha_gen_salt(uint8_t salt[SALT_SIZE])
 {
-	return RAND_bytes(salt, SALT_SIZE);
+	int32_t res = RAND_bytes(salt, SALT_SIZE);
+	if (!res)
+		return ERR_get_error();
+	
+	return 0;
 }
 
 int32_t sha_hash(const uint8_t *msg, size_t len, uint8_t salt[SALT_SIZE], uint16_t cycles, uint8_t result[DIGEST_SIZE])
@@ -57,7 +61,7 @@ int32_t sha_hash(const uint8_t *msg, size_t len, uint8_t salt[SALT_SIZE], uint16
 	uint8_t *tmp = (uint8_t*)calloc(len + SALT_SIZE, sizeof(uint8_t));
 
 	if (!tmp)
-		return false;
+		return ERR_get_error();
 
 	memcpy(tmp, msg, len * sizeof(uint8_t));
 	memcpy(tmp + len, salt, SALT_SIZE);
@@ -70,7 +74,7 @@ int32_t sha_hash(const uint8_t *msg, size_t len, uint8_t salt[SALT_SIZE], uint16
 			|| !SHA256_Final(result, &sha256))
 		{
 			free(tmp);
-			return false;
+			return ERR_get_error();
 		}
 
 		if (i == 0)
@@ -79,7 +83,7 @@ int32_t sha_hash(const uint8_t *msg, size_t len, uint8_t salt[SALT_SIZE], uint16
 			if (!tmp2)
 			{
 				free(tmp);
-				return false;
+				return ERR_get_error();
 			}
 
 			tmp = tmp2;
@@ -90,7 +94,7 @@ int32_t sha_hash(const uint8_t *msg, size_t len, uint8_t salt[SALT_SIZE], uint16
 	}
 
 	free(tmp);
-	return true;
+	return 0;
 }
 
 // Define C extern for C++

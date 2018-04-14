@@ -37,6 +37,8 @@ extern "C"
 
 // Standard library
 #include <openssl/rand.h>
+#include <openssl/aes.h>
+#include <openssl/evp.h>
 #include <openssl/err.h>
 
 // Constant definitions
@@ -46,7 +48,16 @@ const int32_t IV_SIZE = 16;
 // Function definitions
 int32_t aes_gen_iv(uint8_t iv[IV_SIZE])
 {
-	return RAND_bytes(iv, IV_SIZE);
+	int32_t res = RAND_bytes(iv, IV_SIZE);
+	if (!res)
+		return ERR_get_error();
+	
+	return 0;
+}
+
+int32_t aes_encrypt(const uint8_t *msg, uint64_t len, const uint8_t key[KEY_SIZE], const uint8_t iv[IV_SIZE], uint8_t **result, uint64_t *reslen)
+{
+
 }
 
 // Define C extern for C++
