@@ -2,6 +2,7 @@ CC=gcc
 LD=ld
 
 CFLAGS=-std=c99 -Wall
+LDFLAGS=
 
 TIMESTAMP="$(shell date -u +'L\"%Y-%m-%dT%H:%M:%SZ\"')"
 COMMIT="L\"$(shell git rev-parse HEAD)\""
@@ -27,7 +28,7 @@ $(OBJ)%.o: %.c $(DEPS)
 $(ODIR)/$(ONAME): $(OBJS)
 	@[ -d $(ODIR) ] || mkdir -p $(ODIR)
 	@echo " [ LD ] " $@
-	@$(CC) -fuse-ld=$(LD) $(LIBS) $^ -o $@
+	@$(CC) -fuse-ld=$(LD) $(LIBS) $^ -o $@ $(LDFLAGS)
 	@echo " [ ST ] " $@
 	@strip $@
 
