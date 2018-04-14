@@ -74,6 +74,7 @@ int32_t zlib_compress(const uint8_t *data, uint64_t length, uint8_t **result, ui
 		}
 
 		*result = result2;
+		*reslen = buflen;
 	}
 
 	return res;

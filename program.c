@@ -379,7 +379,46 @@ bool encode(const wchar_t *password, size_t passlen, uint8_t *file, size_t filel
 		return false;
 	}
 
+	// Reallocate the message buffer
+	uint32_t isize = sizeof(int32_t);
+	uint8_t *data2 = (uint8_t*)calloc(datalen + isize, sizeof(uint8_t));
+	if (!data2)
+	{
+		werrorf(L"Error allocating data buffer (E_MSG_BUFFER_ZLIB_AES).\n");
+		return false;
+	}
+	memcpy(data2 + isize, data, datalen);
+	*((int32_t*)data2) = STEG_MAGIC;
+	uint64_t data2len = datalen + isize;
+
+	// Encrypt the data
+	res = aes_encrypt(data2, data2len, key, iv, &data, &datalen);
+	if (res)
+	{
+		werrorf(L"Error encrypting data (%d). Refer to OpenSSL manual for details.\n", res);
+		return false;
+	}
+
+	// Load the PNG file pixels
+
+
+	// Prepare steganographic data
+	StegMessage smsg;
+	steg_init_msg(&smsg);
+	smsg.flags = isfile ? MSG_FILE : 0;
+	smsg.cycles = hc;
+	memcpy(smsg.iv, iv, IV_SIZE);
+	memcpy(smsg.salt, salt, SALT_SIZE);
+	smsg.length = data2len;
+	smsg.contents = (uint8_t*)calloc(datalen, sizeof(uint8_t));
+	memcpy(smsg.contents, data, datalen);
+
+	// Steganographically encode the data
+	
+
 	// Free memory
+	free(smsg.contents);
+	free(data2);
 	free(data);
 
 	// Return success
