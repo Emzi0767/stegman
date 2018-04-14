@@ -116,7 +116,7 @@ bool zlib_compress(const uint8_t *data, uint64_t length, uint8_t **result, uint6
 			}
 
 			// Copy compressed data to output
-			memcpy(*result, out, compd);
+			memcpy(*result + clen, out, compd);
 		}
 		while (stream.avail_out == 0);
 	}
