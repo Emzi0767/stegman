@@ -42,10 +42,10 @@ extern "C"
 #include <locale.h>
 
 // Constant definitions
-const wchar_t* const PROGRAM_NAME        = L"Stegman";
-const wchar_t* const PROGRAM_VERSION     = L"1.0.0";
-const wchar_t* const PROGRAM_AUTHOR      = L"Mateusz Brawański (Emzi0767)";
-const wchar_t* const PROGRAM_DESCRIPTION = L"Stegman is a small utility for safely encoding files or messages in other files using steganography.";
+const wchar_t *const PROGRAM_NAME        = L"Stegman";
+const wchar_t *const PROGRAM_VERSION     = L"1.0.0";
+const wchar_t *const PROGRAM_AUTHOR      = L"Mateusz Brawański (Emzi0767)";
+const wchar_t *const PROGRAM_DESCRIPTION = L"Stegman is a small utility for safely encoding files or messages in other files using steganography.";
 
 // Function declarations
 /*
@@ -56,14 +56,23 @@ const wchar_t* const PROGRAM_DESCRIPTION = L"Stegman is a small utility for safe
  *
  * returns: The number of formatted items.
  */
-int32_t werrorf(const wchar_t* format, ...);
+int32_t werrorf(const wchar_t *format, ...);
 
 /*
  * Prints information about program usage.
  *
  * progname: Program invocation.
  */
-void print_usage(char* progname);
+void print_usage(char *progname);
+
+/*
+ * Quits the program with specified error message and status code.
+ *
+ * code: Error code to quit with.
+ * format: Message to quit the program with.
+ * ...: Arguments to format the message.
+ */
+void fail(int32_t code, wchar_t *format, ...);
 
 /*
  * Encodes data.
@@ -113,68 +122,70 @@ int32_t main(int argc, char** argv)
 	for (int i = 0; i < oplen; i++)
 		argv[1][i] = tolower(argv[1][i]);
 
-	if (strcmp(argv[1], "encode"))
+	if (strcmp(argv[1], "encode") == 0 && argc == 5)
 	{
 		// Encode the data
 		// TODO: free things on failure
 		// TODO: introduce failure helper
 
 		// Attempt to load the PNG file
-		FILE* fpng = fopen(argv[3], "rb");
+		FILE *fpng = fopen(argv[3], "rb");
 		if (!fpng)
-		{
-			werrorf(L"There was an error opening '%s'\n", argv[3]);
-			return 2;
-		}
+			fail(2, L"There was an error opening '%s'\n", argv[3]);
 
 		// Get its size
 		if (!fseek(fpng, 0L, SEEK_END))
 		{
-			werrorf(L"There was an error measuring the file size (E_ERR_SEEK_END)\n");
-			return 4;
+			fclose(fpng);
+			fail(4, L"There was an error measuring the file size (E_ERR_SEEK_END)\n");
 		}
+
 		int64_t fsize = ftell(fpng);
 		if (fsize == -1L)
 		{
-			werrorf(L"There was an error measuring the file size (E_ERR_GET_POS)\n");
-			return 8;
+			fclose(fpng);
+			fail(8, L"There was an error measuring the file size (E_ERR_GET_POS)\n");
 		}
+
 		if (!fseek(fpng, 0L, SEEK_SET))
 		{
-			werrorf(L"There was an error measuring the file size (E_ERR_SEEK_BEGIN)\n");
-			return 16;
+			fclose(fpng);
+			fail(16, L"There was an error measuring the file size (E_ERR_SEEK_BEGIN)\n");
 		}
 
 		// Allocate the PNG buffer
 		uint8_t *fdata = (uint8_t*)calloc(fsize, sizeof(uint8_t));
 		if (!fdata)
 		{
-			werrorf(L"Could not allocate memory (E_PNG_ALLOC)\n");
-			return 32;
+			fclose(fpng);
+			fail(32, L"Could not allocate memory (E_PNG_ALLOC)\n");
 		}
 
 		// Read the data into the PNG buffer
 		if (fread(fdata, sizeof(uint8_t), (size_t)fsize, fpng) != (size_t)fsize)
 		{
-			werrorf(L"Could not read PNG data (E_BUFFER_UNDERRUN)\n");
-			return 64;
+			free(fdata);
+			fclose(fpng);
+			fail(64, L"Could not read PNG data (E_BUFFER_UNDERRUN)\n");
 		}
 
 		// Close the PNG file, we don't need it anymore
 		fclose(fpng);
 
 		// Convert the password to a proper-type string
-		size_t pwlen = mblen(argv[2], MB_CUR_MAX);
+		size_t pwlen = mblen(argv[2], MB_CUR_MAX) + sizeof(wchar_t);
 		wchar_t *pw = (wchar_t*)calloc(pwlen, sizeof(wchar_t));
 		if (!pw)
 		{
-			werrorf(L"Could not allocate memory (E_PWD_ALLOC)\n");
-			return 128;
+			free(fdata);
+			fail(128, L"Could not allocate memory (E_PWD_ALLOC)\n");
 		}
+
 		if (!mbstowcs(pw, argv[2], pwlen))
 		{
-			werrorf(L"Could not convert password (E_PWD_MBCSTOWCS)");
-			return 256;
+			free(pw);
+			free(fdata);
+			fail(256, L"Could not convert password (E_PWD_MBCSTOWCS)");
 		}
 
 		// Check if the input message is a file
@@ -184,22 +195,78 @@ int32_t main(int argc, char** argv)
 		if (isfile)
 		{
 			// Handle as file
+			FILE *fmsg = fopen(argv[4] + 1, "rb");
+			if (!fmsg)
+			{
+				free(pw);
+				free(fdata);
+				fail(2048, L"There was an error opening '%s'\n", argv[4] + 1);
+			}
+
+			if (!fseek(fmsg, 0L, SEEK_END))
+			{
+				fclose(fmsg);
+				free(pw);
+				free(fdata);
+				fail(4096, L"There was an error measuring the file size (E_MSG_SEEK_END)\n");
+			}
+
+			msglen = ftell(fpng);
+			if ((int64_t)msglen == -1)
+			{
+				fclose(fmsg);
+				free(pw);
+				free(fdata);
+				fail(8192, L"There was an error measuring the file size (E_MSG_GET_POS)\n");
+			}
+
+			if (!fseek(fmsg, 0L, SEEK_SET))
+			{
+				fclose(fmsg);
+				free(pw);
+				free(fdata);
+				fail(16384, L"There was an error measuring the file size (E_MSG_SEEK_BEGIN)\n");
+			}
+
+			msg = (uint8_t*)calloc(msglen, sizeof(uint8_t));
+			if (!msg)
+			{
+				fclose(fmsg);
+				free(pw);
+				free(fdata);
+				fail(32768, L"Could not allocate memory (E_MSG_ALLOC)\n");
+			}
+
+			if (fread(msg, sizeof(uint8_t), msglen, fmsg) != msglen)
+			{
+				free(msg);
+				fclose(fmsg);
+				free(pw);
+				free(fdata);
+				fail(65536, L"Could not read message data (E_BUFFER_UNDERRUN)\n");
+			}
+
+			fclose(fmsg);
 		}
 		else
 		{
 			// Handle as unicode string
-			size_t mlen = mblen(argv[4], MB_CUR_MAX);
+			size_t mlen = mblen(argv[4], MB_CUR_MAX) + sizeof(wchar_t);
 			msg = (uint8_t*)calloc(mlen, sizeof(wchar_t));
 			msglen = mlen * sizeof(wchar_t);
 			if (!msg)
 			{
-				werrorf(L"Could not allocate memory (E_MSG_ALLOC)\n");
-				return 512;
+				free(pw);
+				free(fdata);
+				fail(512, L"Could not allocate memory (E_MSG_ALLOC)\n");
 			}
+
 			if (!mbstowcs((wchar_t*)msg, argv[4], mlen))
 			{
-				werrorf(L"Could not convert message (E_MSG_MBCSTOWCS)\n");
-				return 1024;
+				free(msg);
+				free(pw);
+				free(fdata);
+				fail(1024, L"Could not convert message (E_MSG_MBCSTOWCS)\n");
 			}
 		}
 
@@ -208,7 +275,7 @@ int32_t main(int argc, char** argv)
 		free(pw);
 		free(fdata);
 	}
-	else if (strcmp(argv[1], "decode"))
+	else if (strcmp(argv[1], "decode") == 0 && (argc == 3 || argc == 4))
 	{
 		// Decode the data
 	}
@@ -250,6 +317,17 @@ void print_usage(char* progname)
 	werrorf(L"%s encode <password> <target file> <message>\n%s encode <password> <target file> @<source file>\npassword       The password to secure your data before encoding.\ntarget file    The file in which the data will be encoded.\nmessage        Text message to encode in the file.\nsource file    File to encode in the file.\n\n", progname, progname);
 	werrorf(L"%s decode <password> <source file> [target file]\npassword       The password used to secure your encoded data.\nsource file    The file in which the data was encoded.\ntarget file    The file in which the decoded data will be placed.\n\n", progname);
 	werrorf(L"When decoding, and the encoded data comes from a file, you need to specify the target file.\n");
+}
+
+void fail(int32_t code, wchar_t *format, ...)
+{
+	va_list args;
+	va_start(args, format);
+
+	vfwprintf(stderr, format, args);
+
+	va_end(args);
+	exit(code);
 }
 
 // Define C extern for C++
