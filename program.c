@@ -141,7 +141,7 @@ int32_t main(int argc, char** argv)
 			fail(2, L"There was an error opening '%s'\n", argv[3]);
 
 		// Get its size
-		if (!fseek(fpng, 0L, SEEK_END))
+		if (fseek(fpng, 0L, SEEK_END) != 0)
 		{
 			fclose(fpng);
 			fail(4, L"There was an error measuring the file size (E_ERR_SEEK_END)\n");
@@ -154,7 +154,7 @@ int32_t main(int argc, char** argv)
 			fail(8, L"There was an error measuring the file size (E_ERR_GET_POS)\n");
 		}
 
-		if (!fseek(fpng, 0L, SEEK_SET))
+		if (fseek(fpng, 0L, SEEK_SET) != 0)
 		{
 			fclose(fpng);
 			fail(16, L"There was an error measuring the file size (E_ERR_SEEK_BEGIN)\n");
@@ -210,7 +210,7 @@ int32_t main(int argc, char** argv)
 				fail(2048, L"There was an error opening '%s'\n", argv[4] + 1);
 			}
 
-			if (!fseek(fmsg, 0L, SEEK_END))
+			if (fseek(fmsg, 0L, SEEK_END) != 0)
 			{
 				fclose(fmsg);
 				free(pw);
@@ -227,7 +227,7 @@ int32_t main(int argc, char** argv)
 				fail(8192, L"There was an error measuring the file size (E_MSG_GET_POS)\n");
 			}
 
-			if (!fseek(fmsg, 0L, SEEK_SET))
+			if (fseek(fmsg, 0L, SEEK_SET) != 0)
 			{
 				fclose(fmsg);
 				free(pw);
