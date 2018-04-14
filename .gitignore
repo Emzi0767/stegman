@@ -1,6 +1,7 @@
 # Binary files, compilation output
 obj/
 stegman
+core
 
 # Test data
 pics/
