@@ -1,7 +1,7 @@
 CC=gcc
 LD=ld
 
-CFLAGS=-std=c99 -Wall
+CFLAGS=
 LDFLAGS=
 
 TIMESTAMP="$(shell date -u +'L\"%Y-%m-%dT%H:%M:%SZ\"')"
@@ -23,7 +23,7 @@ OBJS = $(OBJ)sha256.o $(OBJ)aes.o $(OBJ)zlib.o $(OBJ)steg.o $(OBJ)png.o $(OBJ)pr
 $(OBJ)%.o: %.c $(DEPS)
 	@[ -d $(OBJ) ] || mkdir -p $(OBJ)
 	@echo " [ CC ] " $@
-	@$(CC) -c -o $@ $< $(CFLAGS) -finput-charset=UTF-8 -D__BUILDINFO__ -D__TIMESTAMP_ISO__=$(TIMESTAMP) -D__GIT_COMMIT__=$(COMMIT) -D__WORKDIR__=$(WORKDIR) -D__MACHINE__=$(MACHINE) -D__USER__=$(USER) -D__COMPILER__=$(COMPILER) -D__HOST__=$(HOST)
+	@$(CC) -std=c99 -Wall -c -o $@ $< $(CFLAGS) -finput-charset=UTF-8 -D__BUILDINFO__ -D__TIMESTAMP_ISO__=$(TIMESTAMP) -D__GIT_COMMIT__=$(COMMIT) -D__WORKDIR__=$(WORKDIR) -D__MACHINE__=$(MACHINE) -D__USER__=$(USER) -D__COMPILER__=$(COMPILER) -D__HOST__=$(HOST)
 
 $(ODIR)/$(ONAME): $(OBJS)
 	@[ -d $(ODIR) ] || mkdir -p $(ODIR)
@@ -35,6 +35,19 @@ $(ODIR)/$(ONAME): $(OBJS)
 .PHONY: clean
 
 clean: $(ODIR)/$(ONAME)
+	@echo " [ RM ] " $(OBJ)
+	@rm -rf $(OBJ)
+	@echo " [ RM ] " $^
+	@rm $^
+
+$(ODIR)/$(ONAME)-dbg: $(OBJS)
+	@[ -d $(ODIR) ] || mkdir -p $(ODIR)
+	@echo " [ LD ] " $@
+	@$(CC) -fuse-ld=$(LD) $(LIBS) $^ -o $@ $(LDFLAGS)
+
+debug: $(ODIR)/$(ONAME)-dbg
+
+clean-debug: $(ODIR)/$(ONAME)-dbg
 	@echo " [ RM ] " $(OBJ)
 	@rm -rf $(OBJ)
 	@echo " [ RM ] " $^

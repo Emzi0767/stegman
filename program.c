@@ -197,7 +197,7 @@ int32_t main(int argc, char** argv)
 
 		// Check if the input message is a file
 		bool isfile = argv[4][0] == '@';
-		uint8_t *msg;
+		uint8_t *msg = NULL;
 		size_t msglen;
 		if (isfile)
 		{
@@ -278,13 +278,13 @@ int32_t main(int argc, char** argv)
 		}
 
 		// Encode the data
-		bool succ = encode(pw, pwlen, fdata, (uint64_t)fsize, msg, msglen, isfile);
+		bool succ = encode(pw, pwlen, fdata, (size_t)fsize, msg, msglen, isfile);
 		if (succ)
 			wprintf(L"This was a triumph! The data was successfully encoded into file '%s'!\n", argv[3]);
 		else
 			wprintf(L"The encoding failed :(\n");
 
-		// Free the file data
+		// Free the memory
 		free(msg);
 		free(pw);
 		free(fdata);
@@ -376,12 +376,16 @@ bool encode(const wchar_t *password, size_t passlen, uint8_t *file, size_t filel
 	uint8_t *data = NULL;
 	uint64_t datalen = 0;
 	res = zlib_compress(message, msglen, &data, &datalen);
-	if (!res)
+	if (res)
 	{
-		werrorf(L"Error compressing data. Refer to ZLib manual for details.\n");
+		werrorf(L"Error compressing data (%d). Refer to ZLib manual for details.\n", res);
 		return false;
 	}
 
+	// Free memory
+	free(data);
+
+	// Return success
 	return true;
 }
 

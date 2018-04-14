@@ -44,7 +44,7 @@ extern "C"
  *
  * returns: Whether the operation succeded.
  */
-bool zlib_compress(const uint8_t *data, uint64_t length, uint8_t **result, uint64_t *reslen);
+int32_t zlib_compress(const uint8_t *data, uint64_t length, uint8_t **result, uint64_t *reslen);
 
 /*
  * Zlib-decompresses supplied data.
@@ -56,7 +56,7 @@ bool zlib_compress(const uint8_t *data, uint64_t length, uint8_t **result, uint6
  *
  * returns: Whether the operation succeeded.
  */
-bool zlib_decompress(const uint8_t *data, uint64_t length, uint8_t **result, uint64_t *reslen);
+int32_t zlib_decompress(const uint8_t *data, uint64_t length, uint8_t **result, uint64_t *reslen);
 
 // Define C extern for C++
 #ifdef __cplusplus
