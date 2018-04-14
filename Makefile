@@ -16,7 +16,7 @@ ODIR=.
 ONAME=stegman
 OBJ=obj/
 
-LIBS=-lm -lssl -lpng -lz
+LIBS=-lm -lssl -lcrypto -lpng -lz
 DEPS = sha256.h aes.h zlib.h steg.h png.h defs.h
 OBJS = $(OBJ)sha256.o $(OBJ)aes.o $(OBJ)zlib.o $(OBJ)steg.o $(OBJ)png.o $(OBJ)program.o
 

@@ -35,10 +35,10 @@ extern "C"
 #endif
 
 // The size of the AES-256 key
-const int32_t KEY_SIZE = 32;
+extern const int32_t KEY_SIZE;
 
 // The size of the AES-256 initialization vector
-const int32_t IV_SIZE = 16;
+extern const int32_t IV_SIZE;
 
 /*
  * Generates an AES-256 Initialization Vector using a Cryptographically-Secure

@@ -33,6 +33,11 @@ extern "C"
 
 // Include relevant headers
 #include "defs.h"
+#include "aes.h"
+#include "sha256.h"
+#include "zlib.h"
+#include "png.h"
+#include "steg.h"
 
 // Include standard library
 #include <stdlib.h>
@@ -40,6 +45,10 @@ extern "C"
 #include <stdio.h>
 #include <string.h>
 #include <locale.h>
+#include <time.h>
+
+// OpenSSL
+#include <openssl/err.h>
 
 // Constant definitions
 const wchar_t *const PROGRAM_NAME        = L"Stegman";
@@ -125,8 +134,6 @@ int32_t main(int argc, char** argv)
 	if (strcmp(argv[1], "encode") == 0 && argc == 5)
 	{
 		// Encode the data
-		// TODO: free things on failure
-		// TODO: introduce failure helper
 
 		// Attempt to load the PNG file
 		FILE *fpng = fopen(argv[3], "rb");
@@ -270,6 +277,13 @@ int32_t main(int argc, char** argv)
 			}
 		}
 
+		// Encode the data
+		bool succ = encode(pw, pwlen, fdata, (uint64_t)fsize, msg, msglen, isfile);
+		if (succ)
+			wprintf(L"This was a triumph! The data was successfully encoded into file '%s'!\n", argv[3]);
+		else
+			wprintf(L"The encoding failed :(\n");
+
 		// Free the file data
 		free(msg);
 		free(pw);
@@ -309,7 +323,7 @@ void print_usage(char* progname)
 	werrorf(L"%s encode <password> <target file> <message>\n%s encode <password> <target file> @<source file>\npassword       The password to secure your data before encoding.\ntarget file    The file in which the data will be encoded.\nmessage        Text message to encode in the file.\nsource file    File to encode in the file.\n\n", progname, progname);
 	werrorf(L"%s decode <password> <source file> [target file]\npassword       The password used to secure your encoded data.\nsource file    The file in which the data was encoded.\ntarget file    The file in which the decoded data will be placed.\n\n", progname);
 	werrorf(L"When decoding, and the encoded data comes from a file, you need to specify the target file.\n");
-		
+
 #ifdef __BUILDINFO__
 	werrorf(L"\nBuild info:\nTimestamp:   %ls\nCommit:      %ls\nPath:        %ls\nMachine:     %ls\nUser:        %ls\nCompiler:    %ls\nHost:        %ls\n", __TIMESTAMP_ISO__, __GIT_COMMIT__, __WORKDIR__, __MACHINE__, __USER__, __COMPILER__, __HOST__);
 #endif // __BUILDINFO__
@@ -324,6 +338,51 @@ void fail(int32_t code, wchar_t *format, ...)
 
 	va_end(args);
 	exit(code);
+}
+
+bool encode(const wchar_t *password, size_t passlen, uint8_t *file, size_t filelen, const uint8_t *message, size_t msglen, bool isfile)
+{
+	uint8_t salt[SALT_SIZE], iv[IV_SIZE], key[KEY_SIZE];
+
+	// Generate salt
+	int32_t res = sha_gen_salt(salt);
+	if (!res)
+	{
+		werrorf(L"Error generating salt (%lu). Refer to OpenSSL docs for RAND_bytes for more details.\n", ERR_get_error());
+		return false;
+	}
+
+	// Generate IV
+	res = aes_gen_iv(iv);
+	if (!res)
+	{
+		werrorf(L"Error generating IV (%lu). Refer to OpenSSL docs for RAND_bytes for more details.\n", ERR_get_error());
+		return false;
+	}
+
+	// Generate hash cycle count
+	srand(time(NULL));
+	uint16_t hc = (uint16_t)(rand() % 32768 + 32767);
+
+	// Create the AES key by hashing the password using SHA-256
+	res = sha_hash((uint8_t*)password, passlen * sizeof(wchar_t), salt, hc, key);
+	if (!res)
+	{
+		werrorf(L"Error generating AES key (%lu). Refer to OpenSSL docs for SHA256 for more details.\n", ERR_get_error());
+		return false;
+	}
+
+	// Compress the data
+	uint8_t *data = NULL;
+	uint64_t datalen = 0;
+	res = zlib_compress(message, msglen, &data, &datalen);
+	if (!res)
+	{
+		werrorf(L"Error compressing data. Refer to ZLib manual for details.\n");
+		return false;
+	}
+
+	return true;
 }
 
 // Define C extern for C++

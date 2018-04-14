@@ -34,7 +34,29 @@ extern "C"
 {
 #endif
 
+/*
+ * Zlib-compresses supplied data.
+ *
+ * data: Data to compress.
+ * length: Length of the data.
+ * result: Pointer to result bytes. The underlying pointer will be initialized.
+ * reslen: Pointer to result length. It will be set to length of resulting data.
+ *
+ * returns: Whether the operation succeded.
+ */
+bool zlib_compress(const uint8_t *data, uint64_t length, uint8_t **result, uint64_t *reslen);
 
+/*
+ * Zlib-decompresses supplied data.
+ *
+ * data: Data to decompress.
+ * length: Length of the data.
+ * result: Pointer to result bytes. The underlying pointer will be initialized.
+ * reslen: Pointer to result length. It will be set to length of resulting data.
+ *
+ * returns: Whether the operation succeeded.
+ */
+bool zlib_decompress(const uint8_t *data, uint64_t length, uint8_t **result, uint64_t *reslen);
 
 // Define C extern for C++
 #ifdef __cplusplus

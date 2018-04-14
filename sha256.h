@@ -35,10 +35,10 @@ extern "C"
 #endif
 
 // The size of the SHA-256 salt
-const int32_t SALT_SIZE = 16;
+extern const int32_t SALT_SIZE;
 
 // The size of the SHA-256 digest
-const int32_t DIGEST_SIZE = 32;
+extern const int32_t DIGEST_SIZE;
 
 /*
  * Generates an SHA-256 Salt using a Cryptographically-Secure Pseudorandom

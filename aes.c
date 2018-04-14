@@ -31,9 +31,23 @@ extern "C"
 {
 #endif
 
-// Appropriate header
+// Appropriate headers
 #include "defs.h"
 #include "aes.h"
+
+// Standard library
+#include <openssl/rand.h>
+#include <openssl/err.h>
+
+// Constant definitions
+const int32_t KEY_SIZE = 32;
+const int32_t IV_SIZE = 16;
+
+// Function definitions
+int32_t aes_gen_iv(uint8_t iv[IV_SIZE])
+{
+	return RAND_bytes(iv, IV_SIZE);
+}
 
 // Define C extern for C++
 #ifdef __cplusplus

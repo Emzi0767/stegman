@@ -35,7 +35,7 @@ extern "C"
 #endif
 
 // Steganography data magic
-const int32_t STEG_MAGIC = 0x0BADFACE;
+extern const int32_t STEG_MAGIC;
 
 // Message setting flags
 typedef enum StegMessageFlags

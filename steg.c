@@ -38,6 +38,9 @@ extern "C"
 // Standard library
 #include <string.h>
 
+// Constant definitions
+const int32_t STEG_MAGIC = 0x0BADFACE;
+
 // Function definitions
 void steg_init_msg(StegMessage *msg)
 {
