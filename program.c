@@ -318,7 +318,7 @@ int32_t werrorf(const wchar_t* format, ...)
 
 void print_usage(char* progname)
 {
-	werrorf(L"%ls v%ls by %ls\n%ls\n\nUsage:\n\n", PROGRAM_NAME, PROGRAM_VERSION, PROGRAM_AUTHOR, PROGRAM_DESCRIPTION);
+	werrorf(L"%ls v%ls by %ls\n%ls\n\nUsage:\n", PROGRAM_NAME, PROGRAM_VERSION, PROGRAM_AUTHOR, PROGRAM_DESCRIPTION);
 	werrorf(L"In order to use %ls, you need to specify operation mode. The program has 2 modes: encode, decode. Described below are arguments for each available mode.\n\n", PROGRAM_NAME);
 	werrorf(L"%s encode <password> <target file> <message>\n%s encode <password> <target file> @<source file>\npassword       The password to secure your data before encoding.\ntarget file    The file in which the data will be encoded.\nmessage        Text message to encode in the file.\nsource file    File to encode in the file.\n\n", progname, progname);
 	werrorf(L"%s decode <password> <source file> [target file]\npassword       The password used to secure your encoded data.\nsource file    The file in which the data was encoded.\ntarget file    The file in which the decoded data will be placed.\n\n", progname);
