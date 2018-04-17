@@ -33,11 +33,8 @@ extern "C"
 
 // Include relevant headers
 #include "defs.h"
-#include "aes.h"
-#include "sha256.h"
-#include "zlib.h"
-#include "png.h"
-#include "steg.h"
+#include "encode.h"
+#include "decode.h"
 
 // Include standard library
 #include <stdlib.h>
@@ -45,70 +42,12 @@ extern "C"
 #include <stdio.h>
 #include <string.h>
 #include <locale.h>
-#include <time.h>
 
 // Constant definitions
 const wchar_t *const PROGRAM_NAME        = L"Stegman";
 const wchar_t *const PROGRAM_VERSION     = L"1.0.0";
 const wchar_t *const PROGRAM_AUTHOR      = L"Mateusz Brawański (Emzi0767)";
 const wchar_t *const PROGRAM_DESCRIPTION = L"Stegman is a small utility for safely encoding files or messages in other files using steganography.";
-
-// Function declarations
-/*
- * Prints a formatted string to standard error.
- *
- * format: Format for the outputted string.
- * args: Arguments for the string formatter.
- *
- * returns: The number of formatted items.
- */
-int32_t werrorf(const wchar_t *format, ...);
-
-/*
- * Prints information about program usage.
- *
- * progname: Program invocation.
- */
-void print_usage(char *progname);
-
-/*
- * Quits the program with specified error message and status code.
- *
- * code: Error code to quit with.
- * format: Message to quit the program with.
- * ...: Arguments to format the message.
- */
-void fail(int32_t code, wchar_t *format, ...);
-
-/*
- * Encodes data.
- *
- * password: Password to encrypt the data with.
- * passlen: Length of the password.
- * file: Data of the file to encode the data into.
- * filelen: Length of the file data to encode into.
- * message: Message data to encode.
- * msglen: Length of the message to encode.
- * isfile: Whether the message was a file.
- *
- * returns: Whether the operation was successful.
- */
-bool encode(const wchar_t *password, size_t passlen, uint8_t *file, size_t filelen, const uint8_t *message, size_t msglen, bool isfile);
-
-/*
- * Decodes data.
- *
- * password: Password to decrypt the data with.
- * passlen: Length of the password.
- * file: Data of the file to decode the data from.
- * filelen: Length of the file to decode data from.
- * message: Pointer to message bytes. Underlying pointer will be initialized.
- * msglen: Length of the resulting message.
- * isfile: Whether the message is a file.
- *
- * returns: Whether the operation was successful.
- */
-bool decode(const wchar_t *password, size_t passlen, const uint8_t *file, size_t filelen, uint8_t **message, size_t *msglen, bool *isfile);
 
 // Entry point
 int32_t main(int argc, char** argv)
@@ -335,94 +274,6 @@ void fail(int32_t code, wchar_t *format, ...)
 
 	va_end(args);
 	exit(code);
-}
-
-bool encode(const wchar_t *password, size_t passlen, uint8_t *file, size_t filelen, const uint8_t *message, size_t msglen, bool isfile)
-{
-	uint8_t salt[SALT_SIZE], iv[IV_SIZE], key[KEY_SIZE];
-
-	// Generate salt
-	int32_t res = sha_gen_salt(salt);
-	if (res)
-	{
-		werrorf(L"Error generating salt (%lu). Refer to OpenSSL docs for RAND_bytes for more details.\n", res);
-		return false;
-	}
-
-	// Generate IV
-	res = aes_gen_iv(iv);
-	if (res)
-	{
-		werrorf(L"Error generating IV (%lu). Refer to OpenSSL docs for RAND_bytes for more details.\n", res);
-		return false;
-	}
-
-	// Generate hash cycle count
-	srand(time(NULL));
-	uint16_t hc = (uint16_t)(rand() % 32768 + 32767);
-
-	// Create the AES key by hashing the password using SHA-256
-	res = sha_hash((uint8_t*)password, passlen * sizeof(wchar_t), salt, hc, key);
-	if (res)
-	{
-		werrorf(L"Error generating AES key (%lu). Refer to OpenSSL docs for SHA256 for more details.\n", res);
-		return false;
-	}
-
-	// Compress the data
-	uint8_t *data = NULL;
-	uint64_t datalen = 0;
-	res = zlib_compress(message, msglen, &data, &datalen);
-	if (res)
-	{
-		werrorf(L"Error compressing data (%d). Refer to ZLib manual for details.\n", res);
-		return false;
-	}
-
-	// Reallocate the message buffer
-	uint32_t isize = sizeof(int32_t);
-	uint8_t *data2 = (uint8_t*)calloc(datalen + isize, sizeof(uint8_t));
-	if (!data2)
-	{
-		werrorf(L"Error allocating data buffer (E_MSG_BUFFER_ZLIB_AES).\n");
-		return false;
-	}
-	memcpy(data2 + isize, data, datalen);
-	*((int32_t*)data2) = STEG_MAGIC;
-	uint64_t data2len = datalen + isize;
-
-	// Encrypt the data
-	res = aes_encrypt(data2, data2len, key, iv, &data, &datalen);
-	if (res)
-	{
-		werrorf(L"Error encrypting data (%d). Refer to OpenSSL manual for details.\n", res);
-		return false;
-	}
-
-	// Load the PNG file pixels
-
-
-	// Prepare steganographic data
-	StegMessage smsg;
-	steg_init_msg(&smsg);
-	smsg.flags = isfile ? MSG_FILE : 0;
-	smsg.cycles = hc;
-	memcpy(smsg.iv, iv, IV_SIZE);
-	memcpy(smsg.salt, salt, SALT_SIZE);
-	smsg.length = data2len;
-	smsg.contents = (uint8_t*)calloc(datalen, sizeof(uint8_t));
-	memcpy(smsg.contents, data, datalen);
-
-	// Steganographically encode the data
-	
-
-	// Free memory
-	free(smsg.contents);
-	free(data2);
-	free(data);
-
-	// Return success
-	return true;
 }
 
 // Define C extern for C++

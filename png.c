@@ -35,6 +35,18 @@ extern "C"
 #include "defs.h"
 #include "png.h"
 
+// Standard library
+#include <png.h>
+
+// Function definitions
+int32_t png_load_pixels(const uint8_t *src, size_t srclen, uint8_t **tgt, size_t *tgtlen, PngImageInfo *imginfo)
+{
+    if (png_sig_cmp(src, 0, srclen))
+        return 1;
+
+    
+}
+
 // Define C extern for C++
 #ifdef __cplusplus
 }

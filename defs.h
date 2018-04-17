@@ -60,6 +60,35 @@ extern const wchar_t* const PROGRAM_VERSION;
 extern const wchar_t* const PROGRAM_AUTHOR;
 extern const wchar_t* const PROGRAM_DESCRIPTION;
 
+// Function declarations
+
+// Function declarations
+/*
+ * Prints a formatted string to standard error.
+ *
+ * format: Format for the outputted string.
+ * args: Arguments for the string formatter.
+ *
+ * returns: The number of formatted items.
+ */
+int32_t werrorf(const wchar_t *format, ...);
+
+/*
+ * Prints information about program usage.
+ *
+ * progname: Program invocation.
+ */
+void print_usage(char *progname);
+
+/*
+ * Quits the program with specified error message and status code.
+ *
+ * code: Error code to quit with.
+ * format: Message to quit the program with.
+ * ...: Arguments to format the message.
+ */
+void fail(int32_t code, wchar_t *format, ...);
+
 // Define C extern for C++
 #ifdef __cplusplus
 }
