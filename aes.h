@@ -34,49 +34,53 @@ extern "C"
 {
 #endif
 
-// The size of the AES-256 key
+/** The size of the AES-256 key, in bytes. */
 extern const int32_t KEY_SIZE;
 
-// The size of the AES-256 initialization vector
+/** The size of the AES-256 initialization vector, in bytes. */
 extern const int32_t IV_SIZE;
 
-/*
+/**
  * Generates an AES-256 Initialization Vector using a Cryptographically-Secure
  * Pseudorandom Number Generator.
  *
- * iv: Array to fill with IV bytes.
+ * \param iv Array to fill with IV bytes.
  *
- * returns: Whether the operation succeeded.
+ * \return Whether the operation succeeded.
  */
 int32_t aes_gen_iv(uint8_t iv[IV_SIZE]);
 
-/*
- * Encrypts a specified message, using specified key and initialization vector.
+/**
+ * Encrypts a specified message, using the AES-256 algorithm, with specified 
+ * key and initialization vector.
  *
- * msg: Pointer to byte array, containing data to encrypt.
- * len: Length of the data to encrypt.
- * key: Key to use when encrypting.
- * iv: Initialization vector to use when encrypting.
- * result: Pointer to a pointer to byte array where encrypted data will be
- *         placed. The pointer to bytes will be initialized.
- * reslen: Pointer to integer, which will be set to resulting data length.
+ * \param msg Pointer to byte array, containing data to encrypt.
+ * \param len Length of the data to encrypt.
+ * \param key Key to use when encrypting.
+ * \param iv Initialization vector to use when encrypting.
+ * \param result Pointer to a pointer to byte array where encrypted data will 
+ *               be placed. The pointer to bytes will be initialized.
+ * \param reslen Pointer to integer, which will be set to resulting data 
+ *               length.
  *
- * returns: Whether the operation succeeded.
+ * \return 0 if the operation was successful, an error code otherwise.
  */
 int32_t aes_encrypt(const uint8_t *msg, uint64_t len, const uint8_t key[KEY_SIZE], const uint8_t iv[IV_SIZE], uint8_t **result, uint64_t *reslen);
 
-/*
- * Decrypts a specified message, using specified key and initialization vector.
+/**
+ * Decrypts a specified message, using the AES-256 algorithm, with specified 
+ * key and initialization vector.
  *
- * msg: Pointer to byte array containing data to decrypt.
- * len: Length of the data to decrypt.
- * key: Key to use when decrypting.
- * iv: Initialization vector to use when decrypting.
- * result: Pointer to a pointer to byte array where decrypted data will be
- *         placed.
- * reslen: Pointer to integer, which will be set to resulting data length.
+ * \param msg Pointer to byte array containing data to decrypt.
+ * \param len Length of the data to decrypt.
+ * \param key Key to use when decrypting.
+ * \param iv Initialization vector to use when decrypting.
+ * \param result Pointer to a pointer to byte array where decrypted data will 
+ *               be placed.
+ * \param reslen Pointer to integer, which will be set to resulting data 
+ *               length.
  *
- * returns: Whether the operation succeeded.
+ * \return 0 if the operation was successful, an error code otherwise.
  */
 int32_t aes_decrypt(const uint8_t *msg, uint64_t len, const uint8_t key[KEY_SIZE], const uint8_t iv[IV_SIZE], uint8_t **result, uint64_t *reslen);
 

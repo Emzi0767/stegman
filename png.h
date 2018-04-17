@@ -34,15 +34,30 @@ extern "C"
 {
 #endif
 
-// Metadata about the loaded image.
+/**
+ * Metadata about the loaded image. This is basic information about the loaded
+ * pixel data.
+ */
 typedef struct PngImageInfo
 {
+	/**
+	 * Width of the image, in pixels.
+	 */
 	int32_t width;
+
+	/**
+	 * Height of the image, in pixels.
+	 */
 	int32_t height;
-	uint8_t bit_depth;
+
+	/**
+	 * Colour depth of the picture, in bits. To get the number of bytes per 
+	 * pixel, divide this number by 8.
+	 */
+	uint8_t bit_depth; 
 } PngImageInfo;
 
-/*
+/**
  * Loads pixels from a supplied PNG image.
  *
  * src: Bytes of the image file.
@@ -51,11 +66,11 @@ typedef struct PngImageInfo
  * tgtlen: Pointer to length of resulting data.
  * imginfo: Information about the image.
  *
- * returns: Whether the operation succeded.
+ * \return 0 if the operation was successful, an error code otherwise.
  */
 int32_t png_load_pixels(const uint8_t *src, size_t srclen, uint8_t **tgt, size_t *tgtlen, PngImageInfo *imginfo);
 
-/*
+/**
  * Writes supplied pixels to a PNG file.
  *
  * src: Pixels to write.
@@ -64,7 +79,7 @@ int32_t png_load_pixels(const uint8_t *src, size_t srclen, uint8_t **tgt, size_t
  * tgt: Pointer to target PNG bytes. This pointer will be initialized.
  * tgtlen: Pointer to length of resulting data.
  *
- * returns: Whether the operation succeeded.
+ * \return 0 if the operation was successful, an error code otherwise.
  */
 int32_t png_save_pixels(const uint8_t *src, size_t srclen, const PngImageInfo imginfo, uint8_t **tgt, size_t *tgtlen);
 

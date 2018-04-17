@@ -34,18 +34,20 @@ extern "C"
 {
 #endif
 
-/*
- * Encodes data.
+/**
+ * Encodes data into the picture. This method will encode data into the pixels,
+ * in-place.
  *
- * password: Password to encrypt the data with.
- * passlen: Length of the password.
- * file: Data of the file to encode the data into.
- * filelen: Length of the file data to encode into.
- * message: Message data to encode.
- * msglen: Length of the message to encode.
- * isfile: Whether the message was a file.
+ * \param password Password to encrypt the data with.
+ * \param passlen Length of the password, as measured by `wcslen`.
+ * \param file Data of the file to encode the data into. This should contain
+ *             raw data of the PNG file.
+ * \param filelen Length of the file data to encode into.
+ * \param message Bytes of the message to encode.
+ * \param msglen Length of the message to encode.
+ * \param isfile Whether the message is a file.
  *
- * returns: Whether the operation was successful.
+ * \return Whether the operation was successful.
  */
 bool encode(const wchar_t *password, size_t passlen, uint8_t *file, size_t filelen, const uint8_t *message, size_t msglen, bool isfile);
 

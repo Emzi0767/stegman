@@ -34,67 +34,67 @@ extern "C"
 {
 #endif
 
-// Steganography data magic
+/** Magic value, which indicates valid stegman data. */
 extern const int32_t STEG_MAGIC;
 
-// Message setting flags
+/** Settings of the encoded message. */
 typedef enum StegMessageFlags
 {
-	// The source message was a file
+	/** Indicates tht the source message was a file. */
 	MSG_FILE = 1
 } StegMessageFlags;
 
-// Structure holding the message
+/** Information about the encoded message. */
 typedef struct StegMessage
 {
-	// 0x0BADFACE
+	/** Magic value of the message, should be equal to `0x0BADFACE`. */
 	const int32_t magic;
 
-	// Setting flags of the message
+	/** Settings of the encoded message. */
 	StegMessageFlags flags;
 
-	// Number of cycles to hash the password
+	/** Number of hash cycles to use for password to key conversion. */
 	uint16_t cycles;
 
-	// Initialization vector for AES
+	/** Initialization vector for AES algorithm. */
 	uint8_t iv[16];
 
-	// Salt to use for password
+	/** Salt to use for password to key conversion. */
 	uint8_t salt[16];
 
-	// Length of the encoded data
+	/** Length of the encoded data, in bytes. */
 	uint64_t length;
 
-	// Pointer to data
+	/** Pointer to bytes of the content. This data is encrypted and compressed. */
 	uint8_t *contents;
 } StegMessage;
 
-/*
+/**
  * Initializes given StegMessage with proper constants.
  *
- * msg: Pointer to the message to initialize.
+ * \param msg Pointer to the message to initialize.
  */
 void steg_init_msg(StegMessage *msg);
 
-/*
+/**
  * Encodes supplied data in the supplied pixel array.
  *
- * data: Data to encode in the pixels.
- * pixels: Pixels to encode the data in.
- * pixellen: Length of the encoding pixel array.
+ * \param data Message data to encode in the pixels.
+ * \param pixels Pixels to encode the data in.
+ * \param pixellen Length of the pixel array the data is being encoded in.
  *
- * returns: Whether the operation succeded.
+ * \return Whether the operation succeded.
  */
 bool steg_encode(const StegMessage *data, uint8_t *pixels, size_t pixellen);
 
-/*
- * Decodes supplied data from the supplied pixel array.
+/**
+ * Decodes data from the supplied pixel array.
  *
- * pixels: Pixels to decode the data from.
- * pixellen: Length of the decoded pixel array.
- * data: Pointer to the structure with decoded data.
+ * \param pixels Pixels to decode the data from.
+ * \param pixellen Length of the decoded pixel array.
+ * \param data Pointer to the structure with decoded data.
  *
- * returns: Whether the operation succeeded.
+ * \return Whether the operation succeeded.
  */
 bool steg_decode(const uint8_t *pixels, size_t pixellen, StegMessage *data);
 

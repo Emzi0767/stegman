@@ -6,3 +6,9 @@ core
 
 # Test data
 pics/
+
+# Compiled documentation
+docs/
+
+# Doxygen backup file
+Doxyfile.bak

@@ -34,27 +34,27 @@ extern "C"
 {
 #endif
 
-/*
+/**
  * Zlib-compresses supplied data.
  *
- * data: Data to compress.
- * length: Length of the data.
- * result: Pointer to result bytes. The underlying pointer will be initialized.
- * reslen: Pointer to result length. It will be set to length of resulting data.
+ * \param data Data to compress.
+ * \param length Length of the data.
+ * \param result Pointer to result bytes. The underlying pointer will be initialized.
+ * \param reslen Pointer to result length. It will be set to length of compressed data.
  *
- * returns: Whether the operation succeded.
+ * \return 0 if the operation was successful, an error code otherwise.
  */
 int32_t zlib_compress(const uint8_t *data, uint64_t length, uint8_t **result, uint64_t *reslen);
 
-/*
+/**
  * Zlib-decompresses supplied data.
  *
- * data: Data to decompress.
- * length: Length of the data.
- * result: Pointer to result bytes. The underlying pointer will be initialized.
- * reslen: Pointer to result length. It will be set to length of resulting data.
+ * \param data Data to decompress.
+ * \param length Length of the data.
+ * \param result Pointer to result bytes. The underlying pointer will be initialized.
+ * \param reslen Pointer to result length. It will be set to length of resulting data.
  *
- * returns: Whether the operation succeeded.
+ * \return 0 if the operation was successful, an error code otherwise.
  */
 int32_t zlib_decompress(const uint8_t *data, uint64_t length, uint8_t **result, uint64_t *reslen);
 

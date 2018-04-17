@@ -34,18 +34,21 @@ extern "C"
 {
 #endif
 
-/*
- * Decodes data.
+/**
+ * Decodes data from a picture. This method will read data from the supplied 
+ * PNG image's pixels.
  *
- * password: Password to decrypt the data with.
- * passlen: Length of the password.
- * file: Data of the file to decode the data from.
- * filelen: Length of the file to decode data from.
- * message: Pointer to message bytes. Underlying pointer will be initialized.
- * msglen: Length of the resulting message.
- * isfile: Whether the message is a file.
+ * \param password Password to decrypt the data with.
+ * \param passlen Length of the password.
+ * \param file Data of the file to decode the data from. This should contain 
+ *             raw data of the PNG file.
+ * \param filelen Length of the file to decode data from.
+ * \param message Pointer to message bytes. Underlying pointer will be 
+ *                initialized.
+ * \param msglen Length of the resulting message.
+ * \param isfile Whether the message is a file.
  *
- * returns: Whether the operation was successful.
+ * \return Whether the operation was successful.
  */
 bool decode(const wchar_t *password, size_t passlen, const uint8_t *file, size_t filelen, uint8_t **message, size_t *msglen, bool *isfile);
 
