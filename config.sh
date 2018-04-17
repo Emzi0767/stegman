@@ -156,3 +156,5 @@ echo -n "Cleaning up... "
 rm "config.c"
 rm "Makefile.tmp"
 echo "done"
+
+echo -e "\nYou can now run \e[96mmake\e[0m to build the project"
