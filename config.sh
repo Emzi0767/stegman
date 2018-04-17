@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Check if Makefile is already prepared
 if [ -f "Makefile" ]
