@@ -45,10 +45,10 @@ docs: $(OBJS)
 
 clean:
 	@echo " [ RM ] " $(OBJ)
-	@[ -d "$(OBJ)" ] && rm -rf "$(OBJ)"
+	@(( [ -d "$(OBJ)" ] && rm -rf "$(OBJ)" )) || true
 	@echo " [ RM ] " $(ODIR)/$(ONAME)
-	@[ -f "$(ODIR)/$(ONAME)" ] && rm "$(ODIR)/$(ONAME)"
+	@(( [ -f "$(ODIR)/$(ONAME)" ] && rm "$(ODIR)/$(ONAME)" )) || true
 	@echo " [ RM ] " $(ODIR)/$(ONAME)-dbg
-	@[ -f "$(ODIR)/$(ONAME)-dbg" ] && rm "$(ODIR)/$(ONAME)-dbg"
+	@(( [ -f "$(ODIR)/$(ONAME)-dbg" ] && rm "$(ODIR)/$(ONAME)-dbg" )) || true
 	@echo " [ RM ] " $(DOCS)
-	@[ -d "$(DOCS)" ] && rm -rf "$(DOCS)"
+	@(( [ -d "$(DOCS)" ] && rm -rf "$(DOCS)" )) || true
