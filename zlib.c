@@ -31,7 +31,7 @@ extern "C"
 {
 #endif
 
-// Appropriate header
+// Appropriate headers
 #include "defs.h"
 #include "zlib.h"
 
