@@ -52,3 +52,11 @@ clean-debug: $(ODIR)/$(ONAME)-dbg
 	@rm -rf $(OBJ)
 	@echo " [ RM ] " $^
 	@rm $^
+
+docs: $(OBJS)
+	@echo " [DOCS]  docs/"
+	@doxygen Doxyfile
+
+clean-docs: docs
+	@echo " [ RM ]  docs/"
+	@rm -rf docs
