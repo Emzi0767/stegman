@@ -12,3 +12,6 @@ docs/
 
 # Doxygen backup file
 Doxyfile.bak
+
+# Generated makefiles
+Makefile
