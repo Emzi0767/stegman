@@ -3,6 +3,7 @@ obj/
 stegman
 stegman-dbg
 core
+stegman.tar.gz
 
 # Test data
 pics/

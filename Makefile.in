@@ -26,19 +26,28 @@ $(OBJ)%.o: $(SRC)%.c $(DEPS)
 $(ODIR)/$(ONAME): $(OBJS)
 	@[ -d $(ODIR) ] || mkdir -p $(ODIR)
 	@echo " [ LD ] " $@
-	@$(CC) -fuse-ld=$(LD) $(LIBS) $^ -o $@ $(LDFLAGS)
+	@$(CC) $(LIBS) $^ -o $@ $(LDFLAGS)
 	@echo " [ ST ] " $@
 	@strip $@
 
 $(ODIR)/$(ONAME)-dbg: $(OBJS)
 	@[ -d $(ODIR) ] || mkdir -p $(ODIR)
 	@echo " [ LD ] " $@
-	@$(CC) -fuse-ld=$(LD) $(LIBS) $^ -o $@ $(LDFLAGS)
+	@$(CC) $(LIBS) $^ -o $@ $(LDFLAGS)
+
+dist: $(ODIR)/$(ONAME)
+	@echo " [ DS ] " $(ODIR)/$(ONAME).tar.gz
+	@[ -d "$(ODIR)/dist/$(ONAME)" ] || mkdir -p "$(ODIR)/dist/$(ONAME)"
+	@cp "README.MD" "LICENSE" "$(ODIR)/$(ONAME)" "$(ODIR)/dist/$(ONAME)"
+	@tar czf "$(ODIR)/dist/$(ONAME).tar.gz" -C "$(ODIR)/dist" "$(ONAME)"
+	@(( [ -f "$(ODIR)/$(ONAME).tar.gz" ] && rm "$(ODIR)/$(ONAME).tar.gz" )) || true
+	@mv "$(ODIR)/dist/$(ONAME).tar.gz" "$(ODIR)/$(ONAME).tar.gz"
+	@rm -rf "$(ODIR)/dist"
 
 debug: $(ODIR)/$(ONAME)-dbg
 
 docs: $(OBJS)
-	@echo " [DOCS]  docs/"
+	@echo " [DOCS] " $(DOCS)
 	@doxygen Doxyfile
 
 .PHONY: clean
@@ -52,3 +61,5 @@ clean:
 	@(( [ -f "$(ODIR)/$(ONAME)-dbg" ] && rm "$(ODIR)/$(ONAME)-dbg" )) || true
 	@echo " [ RM ] " $(DOCS)
 	@(( [ -d "$(DOCS)" ] && rm -rf "$(DOCS)" )) || true
+	@echo " [ RM ] " $(ODIR)/$(ONAME).tar.gz
+	@(( [ -f "$(ODIR)/$(ONAME).tar.gz" ] && rm "$(ODIR)/$(ONAME).tar.gz" )) || true
