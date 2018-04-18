@@ -177,6 +177,33 @@ then
 	rm "config.c"
 	exit 1
 fi
+echo "present"
+
+# Check for GNU Make
+echo -n "Checking for working GNU Make... "
+if [ -z "$MAKE" ]
+then
+	MAKE=make
+fi
+MAKE_VERSION=$($MAKE --version | head -n1)
+MAKE_CODE=$?
+if [ $MAKE_CODE != 0 ]
+then
+	echo "not present"
+	echo -e "\e[1m\e[31mERROR: \e[0mCould not find working GNU Make! Make sure GNU Make is installed or that MAKE environment variable is set!"
+	rm "Makefile.tmp"
+	rm "config.c"
+	exit 1
+fi
+if [[ "$MAKE_VERSION" != GNU\ Make* ]]
+then
+	echo "not present"
+	echo -e "\e[1m\e[31mERROR: \e[0m$MAKE is not GNU Make! Install GNU Make or set the MAKE environment variable to point to GNU Make!"
+	rm "Makefile.tmp"
+	rm "config.c"
+	exit 1
+fi
+echo "$MAKE"
 
 # Transform the Makefile appropriately
 echo -n "Saving changes... "
