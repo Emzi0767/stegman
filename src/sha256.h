@@ -20,6 +20,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+/**
+ * \file
+ * \brief SHA-256 wrapper for easy SHA-256 operation.
+ */
+
 // Only include once
 #pragma once
 

@@ -95,11 +95,11 @@ tested under Windows at all.
 Under Debian 10 (Buster) all requirements can be installed by doing:
 
 ```bash
-$ sudo apt-get install clang-6.0 lld-6.0 llvm-6.0 libssl-dev zlib1g-dev libpng-dev make build-essential git
+$ sudo apt-get install clang-6.0 lld-6.0 llvm-6.0 libssl-dev zlib1g-dev libpng-dev make build-essential git bash
 ```
 
 Then you can simply clone this repository, and in its root directory, run 
-`make CC=clang-6.0 LD=lld`
+`CC=clang-6.0 CFLAGS="-O2 -march=native" LDFLAGS=-fuse-ld=lld ./config.sh && make`
 
 ## Libraries
 * OpenSSL
@@ -118,6 +118,42 @@ However, any C99-capable compiler should do the job.
 
 To build the program, you need a Make implementation available on your system. 
 The program was tested with GNU Make.
+
+## Shell
+The configuration script uses Bashisms extensively, so you need a modern 
+version of Bash installed.
+
+# Using the program
+Using the program is fairly straightforward. It has 2 operation modes: encode 
+and decode. 
+
+In below descriptions, `<>` indicates a required argument, `[]` indicates an 
+optional one. Do not put the brackets in actual command invocation. E.g. for
+invocation like `./test <arg1> <arg2>` you would invoke as `./test "asdf" 123`.
+
+## Encoding
+To encode a message (or a file) into a file, run the program as:
+
+`./stegman encode <password> <target file> <message>` to encode a text message, 
+or `./stegman encode <password> <target file> @<source file>` to encode a file.
+
+** Argument**   | **Description**
+:---------------|:---------------
+`password`      | The password to secure your data before encoding.
+`target file`   | The file in which the data will be encoded.
+`message`       | Text message to encode in the file.
+`source file`   | File to encode in the file.
+
+## Decoding
+To decode a message from a file, you would run the program as 
+`./stegman decode <password> <source file> [target file]`. Note that if source 
+message was a file, you must specify target file.
+
+** Argument**   | **Description**
+:---------------|:---------------
+`password`      | The password used to secure your encoded data.
+`source file`   | The file in which the data was encoded.
+`target file`   | The file in which the decoded data will be placed.
 
 # License
 The program and the source are shared under MIT License. See LICENSE file for 

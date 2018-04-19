@@ -20,6 +20,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+/**
+ * \file
+ * \brief General function and constant declarations for stegman.
+ */
+
 // Only include once
 #pragma once
 

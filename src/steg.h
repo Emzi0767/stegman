@@ -20,6 +20,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+/**
+ * \file
+ * \brief Stegman's steganographic function declarations.
+ */
+
 // Only include once
 #pragma once
 
@@ -43,7 +48,7 @@ typedef enum StegMessageFlags
 	/** Indicates no special flags. */
 	MSG_NONE = 0,
 
-	/** Indicates tht the source message was a file. */
+	/** Indicates that the source message was a file. */
 	MSG_FILE = 1
 } StegMessageFlags;
 

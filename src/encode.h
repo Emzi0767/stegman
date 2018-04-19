@@ -20,6 +20,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+/**
+ * \file
+ * \brief Stegman's encoder implementation.
+ */
+
 // Only include once
 #pragma once
 

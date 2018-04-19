@@ -20,6 +20,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+/**
+ * \file
+ * \brief ZLib wrapper for easy ZLib operation.
+ */
+
 // Only include once
 #pragma once
 
