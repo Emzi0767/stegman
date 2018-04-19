@@ -71,14 +71,14 @@ extern const wchar_t* const PROGRAM_DESCRIPTION; /** Description of the program.
  */
 int32_t werrorf(const wchar_t *format, ...);
 
-/*
+/**
  * Prints information about program usage.
  *
  * \param progname Program invocation.
  */
 void print_usage(char *progname);
 
-/*
+/**
  * Quits the program with specified error message and status code.
  *
  * \param code Error code to quit with.
@@ -86,6 +86,15 @@ void print_usage(char *progname);
  * \param ... Arguments to format the message.
  */
 void fail(int32_t code, wchar_t *format, ...);
+
+/**
+ * Calculates the length of a multibyte string.
+ * 
+ * \param str String to examine.
+ * 
+ * \return The length of the multibyte string.
+ */
+size_t mbcslen(char *str);
 
 // Define C extern for C++
 #ifdef __cplusplus

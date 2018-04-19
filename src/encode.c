@@ -100,9 +100,12 @@ bool encode(const wchar_t *password, size_t passlen, FILE *png, const uint8_t *m
 	memcpy(data2 + isize, data, datalen);
 	*((int32_t*)data2) = STEG_MAGIC;
 	uint64_t data2len = datalen + isize;
+	free(data);
 
 	// Encrypt the data
-	res = aes_encrypt(data2, data2len, key, iv, &data, &datalen);
+	uint8_t iv2[IV_SIZE];
+	memcpy(iv2, iv, IV_SIZE * sizeof(uint8_t));
+	res = aes_encrypt(data2, data2len, key, iv2, &data, &datalen);
 	if (res)
 	{
 		free(data2);

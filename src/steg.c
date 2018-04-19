@@ -82,20 +82,20 @@ bool steg_encode(const StegMessage *data, uint8_t *pixels, size_t pixellen)
 		len = ((len / 16) + 1) * 16;
 
 	// Encode magic
-	encode_byte(data->magic >> 24, cpx + (ctr++ * 4));
-	encode_byte(data->magic >> 16, cpx + (ctr++ * 4));
-	encode_byte(data->magic >> 8, cpx + (ctr++ * 4));
 	encode_byte(data->magic, cpx + (ctr++ * 4));
+	encode_byte(data->magic >> 8, cpx + (ctr++ * 4));
+	encode_byte(data->magic >> 16, cpx + (ctr++ * 4));
+	encode_byte(data->magic >> 24, cpx + (ctr++ * 4));
 
 	// Encode flags
-	encode_byte(data->flags >> 24, cpx + (ctr++ * 4));
-	encode_byte(data->flags >> 16, cpx + (ctr++ * 4));
-	encode_byte(data->flags >> 8, cpx + (ctr++ * 4));
 	encode_byte(data->flags, cpx + (ctr++ * 4));
+	encode_byte(data->flags >> 8, cpx + (ctr++ * 4));
+	encode_byte(data->flags >> 16, cpx + (ctr++ * 4));
+	encode_byte(data->flags >> 24, cpx + (ctr++ * 4));
 
 	// Encode hash cycle count
-	encode_byte(data->cycles >> 8, cpx + (ctr++ * 4));
 	encode_byte(data->cycles, cpx + (ctr++ * 4));
+	encode_byte(data->cycles >> 8, cpx + (ctr++ * 4));
 
 	// Encode iv
 	for (int8_t i = 0; i < IV_SIZE; i++)
@@ -106,14 +106,14 @@ bool steg_encode(const StegMessage *data, uint8_t *pixels, size_t pixellen)
 		encode_byte(data->salt[i], cpx + (ctr++ * 4));
 
 	// Encode length
-	encode_byte(data->length >> 56, cpx + (ctr++ * 4));
-	encode_byte(data->length >> 48, cpx + (ctr++ * 4));
-	encode_byte(data->length >> 40, cpx + (ctr++ * 4));
-	encode_byte(data->length >> 32, cpx + (ctr++ * 4));
-	encode_byte(data->length >> 24, cpx + (ctr++ * 4));
-	encode_byte(data->length >> 16, cpx + (ctr++ * 4));
-	encode_byte(data->length >> 8, cpx + (ctr++ * 4));
 	encode_byte(data->length, cpx + (ctr++ * 4));
+	encode_byte(data->length >> 8, cpx + (ctr++ * 4));
+	encode_byte(data->length >> 16, cpx + (ctr++ * 4));
+	encode_byte(data->length >> 24, cpx + (ctr++ * 4));
+	encode_byte(data->length >> 32, cpx + (ctr++ * 4));
+	encode_byte(data->length >> 40, cpx + (ctr++ * 4));
+	encode_byte(data->length >> 48, cpx + (ctr++ * 4));
+	encode_byte(data->length >> 56, cpx + (ctr++ * 4));
 
 	// Encode content
 	cpx += ctr * 4;

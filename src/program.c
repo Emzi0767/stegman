@@ -73,20 +73,23 @@ int32_t main(int argc, char** argv)
 		fail(2, L"There was an error opening '%s'\n", argv[3]);
 
 	// Convert the password to a proper-type string
-	size_t pwlen = mblen(argv[2], MB_CUR_MAX) + sizeof(wchar_t);
-	wchar_t *pw = (wchar_t*)calloc(pwlen, sizeof(wchar_t));
+	size_t pwlen = mbcslen(argv[2]);
+	wchar_t *pw = (wchar_t*)calloc(pwlen + 1, sizeof(wchar_t));
 	if (!pw)
 	{
 		fclose(fpng);
 		fail(128, L"Could not allocate memory (E_PWD_ALLOC)\n");
 	}
 
+	mbtowc(NULL, NULL, 0);
 	if (!mbstowcs(pw, argv[2], pwlen))
 	{
 		free(pw);
 		fclose(fpng);
 		fail(256, L"Could not convert password (E_PWD_MBCSTOWCS)");
 	}
+
+	((wchar_t*)pw)[pwlen] = L'\0';
 
 	if (strcmp(argv[1], "encode") == 0 && argc == 5)
 	{
@@ -115,7 +118,7 @@ int32_t main(int argc, char** argv)
 				fail(4096, L"There was an error measuring the file size (E_MSG_SEEK_END)\n");
 			}
 
-			msglen = ftell(fpng);
+			msglen = ftell(fmsg);
 			if ((int64_t)msglen == -1)
 			{
 				fclose(fmsg);
@@ -155,8 +158,9 @@ int32_t main(int argc, char** argv)
 		else
 		{
 			// Handle as unicode string
-			size_t mlen = mblen(argv[4], MB_CUR_MAX) + sizeof(wchar_t);
-			msg = (uint8_t*)calloc(mlen, sizeof(wchar_t));
+			mblen(NULL, 0);
+			size_t mlen = mbcslen(argv[4]);
+			msg = (uint8_t*)calloc(mlen + 1, sizeof(wchar_t));
 			msglen = mlen * sizeof(wchar_t);
 			if (!msg)
 			{
@@ -165,6 +169,7 @@ int32_t main(int argc, char** argv)
 				fail(512, L"Could not allocate memory (E_MSG_ALLOC)\n");
 			}
 
+			mbtowc(NULL, NULL, 0);
 			if (!mbstowcs((wchar_t*)msg, argv[4], mlen))
 			{
 				free(msg);
@@ -172,6 +177,8 @@ int32_t main(int argc, char** argv)
 				fclose(fpng);
 				fail(1024, L"Could not convert message (E_MSG_MBCSTOWCS)\n");
 			}
+
+			((wchar_t*)msg)[mlen] = L'\0';
 		}
 
 		// Encode the data
@@ -184,7 +191,7 @@ int32_t main(int argc, char** argv)
 		// Free the memory
 		free(msg);
 	}
-	else if (strcmp(argv[1], "decode") == 0 && (argc == 3 || argc == 4))
+	else if (strcmp(argv[1], "decode") == 0 && (argc == 4 || argc == 5))
 	{
 		// Decode the data
 		bool isfile = false;
@@ -196,11 +203,11 @@ int32_t main(int argc, char** argv)
 		else
 			wprintf(L"The decoding failed :(\n");
 
-		if (argc == 4)
+		if (argc == 5)
 		{
 			// Save the file
 		}
-		else if (isfile && argc == 3)
+		else if (isfile && argc == 5)
 		{
 			werrorf(L"The message was decoded successfully, however the source was a file. To save it, you need to specify an output file when launching the program.\n");
 		}
@@ -260,6 +267,24 @@ void fail(int32_t code, wchar_t *format, ...)
 
 	va_end(args);
 	exit(code);
+}
+
+size_t mbcslen(char *str)
+{
+	mblen(NULL, 0);
+
+	size_t len = 0, tmp = 0;
+	char *x = str;
+	do
+	{
+		tmp = mblen(x, MB_CUR_MAX);
+		
+		len++;
+		x += tmp;
+	}
+	while (tmp > 0 && *x != '\0');
+
+	return len;
 }
 
 // Define C extern for C++

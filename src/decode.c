@@ -85,15 +85,49 @@ bool decode(const wchar_t *password, size_t passlen, FILE *png, uint8_t **messag
 	}
 
     // Decrypt the data
+    uint8_t *data = NULL;
+	uint64_t datalen = 0;
+    res = aes_decrypt(smsg.contents, smsg.length, key, smsg.iv, &data, &datalen);
+    if (res)
+    {
+        free(smsg.contents);
+        free(pixels);
+		werrorf(L"Error decrypting data (%d). Refer to OpenSSL manual for details.\n", res);
+		return false;
+    }
 
+    // Check if header matches
+    if (*((int32_t*)data) != STEG_MAGIC)
+    {
+        free(data);
+        free(smsg.contents);
+        free(pixels);
+		werrorf(L"Decrypted data was corrupted or invalid. Did you supply a correct password?\n");
+		return false;
+    }
 
     // Decompress the data
-
+    uint8_t *data2 = NULL;
+    uint64_t data2len = 0;
+    size_t isize = sizeof(int32_t);
+    res = zlib_decompress(data + isize, datalen - isize, &data2, &data2len);
+    if (res)
+    {
+        free(data);
+        free(smsg.contents);
+        free(pixels);
+		werrorf(L"Error decompressing data (%d). Refer to ZLib manual for details.\n", res);
+        return false;
+    }
 
     // Allocate the target buffer and copy the result
-
+    *message = (uint8_t*)calloc(data2len, sizeof(uint8_t));
+    *msglen = data2len;
+    memcpy(*message, data2, data2len);
 
     // Free the memory
+    free(data2);
+    free(data);
     free(smsg.contents);
     free(pixels);
 

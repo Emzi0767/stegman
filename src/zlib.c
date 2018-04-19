@@ -49,24 +49,29 @@ static inline uint64_t max(uint64_t a, uint64_t b)
 // Function definitions
 int32_t zlib_compress(const uint8_t *data, uint64_t length, uint8_t **result, uint64_t *reslen)
 {
-	uint64_t buflen = max(length * 2, length + 256);
-	*reslen = buflen;
-	*result = (uint8_t*)calloc(buflen, sizeof(uint8_t));
+	// Allocate necessary buffers
+	uint64_t buflen = max(length * 2, length + 256) + 8;
+	size_t isize = sizeof(uint64_t);
+	*reslen = buflen + isize;
+	*result = (uint8_t*)calloc(*reslen, sizeof(uint8_t));
 	if (!(*result))
-	{
 		return 16;
-	}
 
-	int32_t res = compress2(*result, &buflen, data, length, Z_BEST_COMPRESSION);
+	// Put the decompressed length in front of the data
+	*((uint64_t*)*result) = length;
+
+	// Compress the data
+	int32_t res = compress2(*result + isize, &buflen, data, length, Z_BEST_COMPRESSION);
 	if (res != Z_OK)
 	{
 		free(*result);
 		return res;
 	}
 
-	if (buflen != *reslen)
+	// Truncate the buffer
+	if (buflen + isize != *reslen)
 	{
-		uint8_t *result2 = realloc(*result, buflen);
+		uint8_t *result2 = realloc(*result, buflen + isize);
 		if (!result2)
 		{
 			free(*result);
@@ -74,7 +79,27 @@ int32_t zlib_compress(const uint8_t *data, uint64_t length, uint8_t **result, ui
 		}
 
 		*result = result2;
-		*reslen = buflen;
+		*reslen = buflen + isize;
+	}
+
+	return res;
+}
+
+int32_t zlib_decompress(const uint8_t *data, uint64_t length, uint8_t **result, uint64_t *reslen)
+{
+	// Allocate necessary buffers
+	size_t isize = sizeof(uint64_t);
+	*reslen = *((uint64_t*)data);
+	*result = (uint8_t*)calloc(*reslen, sizeof(uint8_t));
+	if (!(*result))
+		return 16;
+	
+	// Decompress the data
+	int32_t res = uncompress(*result, reslen, data + isize, length - isize);
+	if (res != Z_OK)
+	{
+		free(*result);
+		return res;
 	}
 
 	return res;
