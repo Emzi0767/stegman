@@ -206,8 +206,23 @@ int32_t main(int argc, char** argv)
 		if (argc == 5)
 		{
 			// Save the file
+			FILE *fmsg = fopen(argv[4], "wb");
+			if (!fmsg)
+			{
+				free(msg);
+				fail(2048, L"There was an error opening '%s'\n", argv[4]);
+			}
+
+			if (fwrite(msg, sizeof(uint8_t), msglen, fmsg) != msglen)
+			{
+				free(msg);
+				fclose(fmsg);
+				fail(4096, L"There was an error writing to '%s'\n", argv[4]);
+			}
+
+			fclose(fmsg);
 		}
-		else if (isfile && argc == 5)
+		else if (isfile && argc == 4)
 		{
 			werrorf(L"The message was decoded successfully, however the source was a file. To save it, you need to specify an output file when launching the program.\n");
 		}

@@ -88,7 +88,7 @@ int32_t aes_decrypt(const uint8_t *msg, uint64_t len, const uint8_t key[KEY_SIZE
 	
 	// Allocate output
 	*reslen = len;
-	*result = (uint8_t*)calloc(*reslen, sizeof(uint8_t));
+	*result = (uint8_t*)calloc(elen, sizeof(uint8_t));
 	if (!result)
 		return 1;
 
