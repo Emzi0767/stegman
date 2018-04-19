@@ -34,15 +34,16 @@ extern "C"
 {
 #endif
 
+// Standard library
+#include <stdio.h>
+
 /**
  * Decodes data from a picture. This method will read data from the supplied 
  * PNG image's pixels.
  *
  * \param password Password to decrypt the data with.
  * \param passlen Length of the password.
- * \param file Data of the file to decode the data from. This should contain 
- *             raw data of the PNG file.
- * \param filelen Length of the file to decode data from.
+ * \param png File to decode the data from. This should be a PNG file.
  * \param message Pointer to message bytes. Underlying pointer will be 
  *                initialized.
  * \param msglen Length of the resulting message.
@@ -50,7 +51,7 @@ extern "C"
  *
  * \return Whether the operation was successful.
  */
-bool decode(const wchar_t *password, size_t passlen, const uint8_t *file, size_t filelen, uint8_t **message, size_t *msglen, bool *isfile);
+bool decode(const wchar_t *password, size_t passlen, FILE *png, uint8_t **message, size_t *msglen, bool *isfile);
 
 // Define C extern for C++
 #ifdef __cplusplus

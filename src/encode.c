@@ -46,7 +46,7 @@ extern "C"
 #include <string.h>
 
 // Function definitions
-bool encode(const wchar_t *password, size_t passlen, uint8_t *file, size_t filelen, const uint8_t *message, size_t msglen, bool isfile)
+bool encode(const wchar_t *password, size_t passlen, FILE *png, const uint8_t *message, size_t msglen, bool isfile)
 {
 	uint8_t salt[SALT_SIZE], iv[IV_SIZE], key[KEY_SIZE];
 
@@ -93,6 +93,7 @@ bool encode(const wchar_t *password, size_t passlen, uint8_t *file, size_t filel
 	uint8_t *data2 = (uint8_t*)calloc(datalen + isize, sizeof(uint8_t));
 	if (!data2)
 	{
+		free(data);
 		werrorf(L"Error allocating data buffer (E_MSG_BUFFER_ZLIB_AES).\n");
 		return false;
 	}
@@ -104,6 +105,8 @@ bool encode(const wchar_t *password, size_t passlen, uint8_t *file, size_t filel
 	res = aes_encrypt(data2, data2len, key, iv, &data, &datalen);
 	if (res)
 	{
+		free(data2);
+		free(data);
 		werrorf(L"Error encrypting data (%d). Refer to OpenSSL manual for details.\n", res);
 		return false;
 	}
@@ -112,10 +115,21 @@ bool encode(const wchar_t *password, size_t passlen, uint8_t *file, size_t filel
 	uint8_t *pixels = NULL;
 	uint64_t pixelcount = 0;
 	PngImageInfo pnginf;
-	res = png_load_pixels(file, filelen, &pixels, &pixelcount, &pnginf);
+	res = png_load_pixels(png, &pixels, &pixelcount, &pnginf);
 	if (res)
 	{
+		free(data2);
+		free(data);
 		werrorf(L"Error loading PNG image (%d). Refer to libpng manual for details.\n", res);
+		return false;
+	}
+
+	// Check if enough space
+	if (data2len > (pixelcount / 4))
+	{
+		free(data2);
+		free(data);
+		werrorf(L"Not enough pixel data to encode the message in!\n");
 		return false;
 	}
 
@@ -131,10 +145,21 @@ bool encode(const wchar_t *password, size_t passlen, uint8_t *file, size_t filel
 	memcpy(smsg.contents, data, datalen);
 
 	// Steganographically encode the data
+	if (!steg_encode(&smsg, pixels, pixelcount))
+	{
+		free(data2);
+		free(data);
+		werrorf(L"Failed to encode data into pixels!\n");
+		return false;
+	}
 	
+	// Write the PNG
+	freopen(NULL, "wb", png); // reopen for writing
+	png_save_pixels(pixels, pixelcount, &pnginf, png);
 
 	// Free memory
 	free(smsg.contents);
+	free(pixels);
 	free(data2);
 	free(data);
 

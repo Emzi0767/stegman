@@ -34,6 +34,9 @@ extern "C"
 {
 #endif
 
+// Standard library
+#include <stdio.h>
+
 /**
  * Metadata about the loaded image. This is basic information about the loaded
  * pixel data.
@@ -60,28 +63,26 @@ typedef struct PngImageInfo
 /**
  * Loads pixels from a supplied PNG image.
  *
- * src: Bytes of the image file.
- * srclen: Length of the source file.
- * tgt: Pointer to target bytes. This pointer will be initialized.
- * tgtlen: Pointer to length of resulting data.
- * imginfo: Information about the image.
+ * \param src Source PNG file.
+ * \param tgt Pointer to target bytes. This pointer will be initialized.
+ * \param tgtlen Pointer to length of resulting data.
+ * \param imginfo Information about the image.
  *
  * \return 0 if the operation was successful, an error code otherwise.
  */
-int32_t png_load_pixels(const uint8_t *src, size_t srclen, uint8_t **tgt, size_t *tgtlen, PngImageInfo *imginfo);
+int32_t png_load_pixels(FILE *src, uint8_t **tgt, size_t *tgtlen, PngImageInfo *imginfo);
 
 /**
  * Writes supplied pixels to a PNG file.
  *
- * src: Pixels to write.
- * srclen: Length of the pixel array.
- * imginfo: Information about the pixels.
- * tgt: Pointer to target PNG bytes. This pointer will be initialized.
- * tgtlen: Pointer to length of resulting data.
+ * \param src Pixels to write.
+ * \param srclen Length of the pixel array.
+ * \param imginfo Information about the pixels.
+ * \param tgt Target PNG file.
  *
  * \return 0 if the operation was successful, an error code otherwise.
  */
-int32_t png_save_pixels(const uint8_t *src, size_t srclen, const PngImageInfo imginfo, uint8_t **tgt, size_t *tgtlen);
+int32_t png_save_pixels(const uint8_t *src, size_t srclen, const PngImageInfo *imginfo, FILE *tgt);
 
 // Define C extern for C++
 #ifdef __cplusplus

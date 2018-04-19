@@ -34,22 +34,23 @@ extern "C"
 {
 #endif
 
+// Standard library
+#include <stdio.h>
+
 /**
  * Encodes data into the picture. This method will encode data into the pixels,
  * in-place.
  *
  * \param password Password to encrypt the data with.
  * \param passlen Length of the password, as measured by `wcslen`.
- * \param file Data of the file to encode the data into. This should contain
- *             raw data of the PNG file.
- * \param filelen Length of the file data to encode into.
+ * \param png File to encode the data into. This should be a PNG file.
  * \param message Bytes of the message to encode.
  * \param msglen Length of the message to encode.
  * \param isfile Whether the message is a file.
  *
  * \return Whether the operation was successful.
  */
-bool encode(const wchar_t *password, size_t passlen, uint8_t *file, size_t filelen, const uint8_t *message, size_t msglen, bool isfile);
+bool encode(const wchar_t *password, size_t passlen, FILE *png, const uint8_t *message, size_t msglen, bool isfile);
 
 // Define C extern for C++
 #ifdef __cplusplus

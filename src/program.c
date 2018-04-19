@@ -66,75 +66,36 @@ int32_t main(int argc, char** argv)
 	size_t oplen = strlen(argv[1]);
 	for (int i = 0; i < oplen; i++)
 		argv[1][i] = tolower(argv[1][i]);
+	
+	// Attempt to load the PNG file
+	FILE *fpng = fopen(argv[3], "rb");
+	if (!fpng)
+		fail(2, L"There was an error opening '%s'\n", argv[3]);
+
+	// Convert the password to a proper-type string
+	size_t pwlen = mblen(argv[2], MB_CUR_MAX) + sizeof(wchar_t);
+	wchar_t *pw = (wchar_t*)calloc(pwlen, sizeof(wchar_t));
+	if (!pw)
+	{
+		fclose(fpng);
+		fail(128, L"Could not allocate memory (E_PWD_ALLOC)\n");
+	}
+
+	if (!mbstowcs(pw, argv[2], pwlen))
+	{
+		free(pw);
+		fclose(fpng);
+		fail(256, L"Could not convert password (E_PWD_MBCSTOWCS)");
+	}
 
 	if (strcmp(argv[1], "encode") == 0 && argc == 5)
 	{
 		// Encode the data
 
-		// Attempt to load the PNG file
-		FILE *fpng = fopen(argv[3], "rb");
-		if (!fpng)
-			fail(2, L"There was an error opening '%s'\n", argv[3]);
-
-		// Get its size
-		if (fseek(fpng, 0L, SEEK_END) != 0)
-		{
-			fclose(fpng);
-			fail(4, L"There was an error measuring the file size (E_ERR_SEEK_END)\n");
-		}
-
-		int64_t fsize = ftell(fpng);
-		if (fsize == -1L)
-		{
-			fclose(fpng);
-			fail(8, L"There was an error measuring the file size (E_ERR_GET_POS)\n");
-		}
-
-		if (fseek(fpng, 0L, SEEK_SET) != 0)
-		{
-			fclose(fpng);
-			fail(16, L"There was an error measuring the file size (E_ERR_SEEK_BEGIN)\n");
-		}
-
-		// Allocate the PNG buffer
-		uint8_t *fdata = (uint8_t*)calloc(fsize, sizeof(uint8_t));
-		if (!fdata)
-		{
-			fclose(fpng);
-			fail(32, L"Could not allocate memory (E_PNG_ALLOC)\n");
-		}
-
-		// Read the data into the PNG buffer
-		if (fread(fdata, sizeof(uint8_t), (size_t)fsize, fpng) != (size_t)fsize)
-		{
-			free(fdata);
-			fclose(fpng);
-			fail(64, L"Could not read PNG data (E_BUFFER_UNDERRUN)\n");
-		}
-
-		// Close the PNG file, we don't need it anymore
-		fclose(fpng);
-
-		// Convert the password to a proper-type string
-		size_t pwlen = mblen(argv[2], MB_CUR_MAX) + sizeof(wchar_t);
-		wchar_t *pw = (wchar_t*)calloc(pwlen, sizeof(wchar_t));
-		if (!pw)
-		{
-			free(fdata);
-			fail(128, L"Could not allocate memory (E_PWD_ALLOC)\n");
-		}
-
-		if (!mbstowcs(pw, argv[2], pwlen))
-		{
-			free(pw);
-			free(fdata);
-			fail(256, L"Could not convert password (E_PWD_MBCSTOWCS)");
-		}
-
 		// Check if the input message is a file
 		bool isfile = argv[4][0] == '@';
 		uint8_t *msg = NULL;
-		size_t msglen;
+		size_t msglen = 0;
 		if (isfile)
 		{
 			// Handle as file
@@ -142,7 +103,7 @@ int32_t main(int argc, char** argv)
 			if (!fmsg)
 			{
 				free(pw);
-				free(fdata);
+				fclose(fpng);
 				fail(2048, L"There was an error opening '%s'\n", argv[4] + 1);
 			}
 
@@ -150,7 +111,7 @@ int32_t main(int argc, char** argv)
 			{
 				fclose(fmsg);
 				free(pw);
-				free(fdata);
+				fclose(fpng);
 				fail(4096, L"There was an error measuring the file size (E_MSG_SEEK_END)\n");
 			}
 
@@ -159,7 +120,7 @@ int32_t main(int argc, char** argv)
 			{
 				fclose(fmsg);
 				free(pw);
-				free(fdata);
+				fclose(fpng);
 				fail(8192, L"There was an error measuring the file size (E_MSG_GET_POS)\n");
 			}
 
@@ -167,7 +128,7 @@ int32_t main(int argc, char** argv)
 			{
 				fclose(fmsg);
 				free(pw);
-				free(fdata);
+				fclose(fpng);
 				fail(16384, L"There was an error measuring the file size (E_MSG_SEEK_BEGIN)\n");
 			}
 
@@ -176,7 +137,7 @@ int32_t main(int argc, char** argv)
 			{
 				fclose(fmsg);
 				free(pw);
-				free(fdata);
+				fclose(fpng);
 				fail(32768, L"Could not allocate memory (E_MSG_ALLOC)\n");
 			}
 
@@ -185,7 +146,7 @@ int32_t main(int argc, char** argv)
 				free(msg);
 				fclose(fmsg);
 				free(pw);
-				free(fdata);
+				fclose(fpng);
 				fail(65536, L"Could not read message data (E_BUFFER_UNDERRUN)\n");
 			}
 
@@ -200,7 +161,7 @@ int32_t main(int argc, char** argv)
 			if (!msg)
 			{
 				free(pw);
-				free(fdata);
+				fclose(fpng);
 				fail(512, L"Could not allocate memory (E_MSG_ALLOC)\n");
 			}
 
@@ -208,13 +169,13 @@ int32_t main(int argc, char** argv)
 			{
 				free(msg);
 				free(pw);
-				free(fdata);
+				fclose(fpng);
 				fail(1024, L"Could not convert message (E_MSG_MBCSTOWCS)\n");
 			}
 		}
 
 		// Encode the data
-		bool succ = encode(pw, pwlen, fdata, (size_t)fsize, msg, msglen, isfile);
+		bool succ = encode(pw, pwlen, fpng, msg, msglen, isfile);
 		if (succ)
 			wprintf(L"This was a triumph! The data was successfully encoded into file '%s'!\n", argv[3]);
 		else
@@ -222,18 +183,43 @@ int32_t main(int argc, char** argv)
 
 		// Free the memory
 		free(msg);
-		free(pw);
-		free(fdata);
 	}
 	else if (strcmp(argv[1], "decode") == 0 && (argc == 3 || argc == 4))
 	{
 		// Decode the data
+		bool isfile = false;
+		uint8_t *msg = NULL;
+		size_t msglen = 0;
+		bool succ = decode(pw, pwlen, fpng, &msg, &msglen, &isfile);
+		if (succ)
+			wprintf(L"This was a triumph! The data was successfully decoded from file '%s'!\n", argv[3]);
+		else
+			wprintf(L"The decoding failed :(\n");
+
+		if (argc == 4)
+		{
+			// Save the file
+		}
+		else if (isfile && argc == 3)
+		{
+			werrorf(L"The message was decoded successfully, however the source was a file. To save it, you need to specify an output file when launching the program.\n");
+		}
+		else
+		{
+			wprintf(L"Decoded message:\n\n%ls\n", (wchar_t*)msg);
+		}
+
+		// Free the memory
+		free(msg);
 	}
 	else
 	{
 		print_usage(argv[0]);
 		return 1;
 	}
+
+	free(pw);
+	fclose(fpng);
 
 	// End of program
 	return 0;
@@ -261,7 +247,7 @@ void print_usage(char* progname)
 	werrorf(L"When decoding, and the encoded data comes from a file, you need to specify the target file.\n");
 
 #ifdef __BUILDINFO__
-	werrorf(L"\nBuild info:\nTimestamp:   %ls\nCommit:      %ls\nPath:        %ls\nMachine:     %ls\nUser:        %ls\nCompiler:    %ls\nHost:        %ls\n", __TIMESTAMP_ISO__, __GIT_COMMIT__, __WORKDIR__, __MACHINE__, __USER__, __COMPILER__, __HOST__);
+	werrorf(L"\nBuild info:\nTimestamp:        %ls\nCommit:           %ls\nPath:             %ls\nMachine:          %ls\nUser:             %ls\nCompiler:         %ls\nHost:             %ls\n", __TIMESTAMP_ISO__, __GIT_COMMIT__, __WORKDIR__, __MACHINE__, __USER__, __COMPILER__, __HOST__);
 #endif // __BUILDINFO__
 }
 

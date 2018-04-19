@@ -40,6 +40,9 @@ extern const int32_t STEG_MAGIC;
 /** Settings of the encoded message. */
 typedef enum StegMessageFlags
 {
+	/** Indicates no special flags. */
+	MSG_NONE = 0,
+
 	/** Indicates tht the source message was a file. */
 	MSG_FILE = 1
 } StegMessageFlags;
