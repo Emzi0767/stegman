@@ -60,17 +60,24 @@ extern "C"
 #include <wctype.h>
 
 // Program metadata
-extern const wchar_t* const PROGRAM_NAME;        /** Name of the program. */
-extern const wchar_t* const PROGRAM_VERSION;     /** Version of the program. Uses semantic versioning scheme. */
-extern const wchar_t* const PROGRAM_AUTHOR;      /** Name of the program's author. */
-extern const wchar_t* const PROGRAM_DESCRIPTION; /** Description of the program. */
+/** Name of the program. */
+extern const wchar_t* const PROGRAM_NAME;
+
+/** Version of the program. Uses semantic versioning scheme. */
+extern const wchar_t* const PROGRAM_VERSION;
+
+/** Name of the program's author. */
+extern const wchar_t* const PROGRAM_AUTHOR;
+
+/** Description of the program. */
+extern const wchar_t* const PROGRAM_DESCRIPTION; 
 
 // Function declarations
 /**
  * Prints a formatted string to standard error.
  *
  * \param format Format for the outputted string.
- * \param args Arguments for the string formatter.
+ * \param ... Arguments for the string formatter.
  *
  * \return The number of formatted items.
  */
