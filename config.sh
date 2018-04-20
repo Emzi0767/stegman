@@ -185,7 +185,7 @@ if [ -z "$MAKE" ]
 then
 	MAKE=make
 fi
-MAKE_VERSION=$($MAKE --version | head -n1)
+MAKE_VERSION=$($MAKE --version 2>/dev/null | head -n1)
 MAKE_CODE=$?
 if [ $MAKE_CODE != 0 ]
 then
@@ -217,4 +217,4 @@ rm "config.c"
 rm "Makefile.tmp"
 echo "done"
 
-echo -e "\nYou can now run \e[96mmake\e[0m to build the project"
+echo -e "\nYou can now run \e[96m$MAKE\e[0m to build the project"
