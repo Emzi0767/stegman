@@ -68,7 +68,7 @@ int32_t main(int argc, char** argv)
 		argv[1][i] = tolower(argv[1][i]);
 	
 	// Attempt to load the PNG file
-	FILE *fpng = fopen(argv[3], "rb");
+	FILE *fpng = fopen(argv[3], "rb+");
 	if (!fpng)
 		fail(2, L"There was an error opening '%s'\n", argv[3]);
 
