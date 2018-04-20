@@ -44,6 +44,7 @@ extern "C"
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+#include <unistd.h>
 
 // Function definitions
 bool encode(const wchar_t *password, size_t passlen, FILE *png, const uint8_t *message, size_t msglen, bool isfile)
@@ -157,7 +158,9 @@ bool encode(const wchar_t *password, size_t passlen, FILE *png, const uint8_t *m
 	}
 	
 	// Write the PNG
-	freopen(NULL, "wb", png); // reopen for writing
+	fflush(png);
+	fseek(png, 0L, SEEK_SET);
+	ftruncate(fileno(png), 0L);
 	png_save_pixels(pixels, pixelcount, &pnginf, png);
 
 	// Free memory
