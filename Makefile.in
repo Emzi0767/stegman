@@ -85,3 +85,13 @@ clean:
 	@(( [ -d "$(DOCS)" ] && rm -rf "$(DOCS)" )) || true
 	@echo " [ RM ] " $(ODIR)/$(ONAME).tar.gz
 	@(( [ -f "$(ODIR)/$(ONAME).tar.gz" ] && rm "$(ODIR)/$(ONAME).tar.gz" )) || true
+
+.PHONY: configclean
+
+configclean:
+	@echo " [ RM ]  Makefile"
+	@(( [ -f "Makefile" ] && rm "Makefile" )) || true
+
+.PHONY: distclean
+
+distclean: clean configclean
