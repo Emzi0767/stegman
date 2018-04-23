@@ -145,7 +145,7 @@ To encode a message (or a file) into a file, run the program as:
 `./stegman encode <password> <target file> <message>` to encode a text message, 
 or `./stegman encode <password> <target file> @<source file>` to encode a file.
 
-** Argument**   | **Description**
+**Argument**    | **Description**
 :---------------|:---------------
 `password`      | The password to secure your data before encoding.
 `target file`   | The file in which the data will be encoded.
@@ -157,7 +157,7 @@ To decode a message from a file, you would run the program as
 `./stegman decode <password> <source file> [target file]`. Note that if source 
 message was a file, you must specify target file.
 
-** Argument**   | **Description**
+**Argument**    | **Description**
 :---------------|:---------------
 `password`      | The password used to secure your encoded data.
 `source file`   | The file in which the data was encoded.
